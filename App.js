@@ -1,20 +1,34 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useFonts } from 'expo-font';
+import { JetBrainsMono_400Regular, JetBrainsMono_700Bold } from '@expo-google-fonts/jetbrains-mono';
+import {SpaceGrotesk_400Regular,SpaceGrotesk_700Bold,} from '@expo-google-fonts/space-grotesk';
 
-export default function App() {
+import Landing from './screens/Landing.js';
+import SignIn from './screens/SignIn.js';
+
+
+const Stack = createNativeStackNavigator();
+
+export default function App(){
+  const [fontsLoaded] = useFonts({
+    JetBrainsMono_400Regular,
+    JetBrainsMono_700Bold,
+    SpaceGrotesk_400Regular,
+    SpaceGrotesk_700Bold,
+
+  });
+  if (!fontsLoaded) {
+    return null; // or loading screen
+  }
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName='Landing'>
+        <Stack.Screen name="Landing" component={Landing}></Stack.Screen>
+        <Stack.Screen name="SignIn" component={SignIn}></Stack.Screen>
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+      </Stack.Navigator>
+    </NavigationContainer>
+);
+}
