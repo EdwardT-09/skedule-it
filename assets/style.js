@@ -2,16 +2,26 @@ import { StyleSheet } from "react-native";
 
 
 const styles= StyleSheet.create({
+    links:{
+        color:'#4ECDC4',
+        textDecorationLine: 'underline',
+    },
+
     center:{
         flex:1,
         alignItems:'center',
 
     },
 
+    trueCenter:{
+        flex:1,
+        alignItems:'center',
+        justifyContent:'center',
+    },
+
 
     container:{
-        width: '80%',
-        height: '55%',
+        width: '90%',
         backgroundColor: '#fff',
         borderRadius: 15,
         borderColor:'black',
@@ -19,11 +29,10 @@ const styles= StyleSheet.create({
     },
 
     titleContainer:{
-        backgroundColor:'#4ECDC4', 
-        borderTopStartRadius:15,
-        borderTopEndRadius:15,
+        borderTopStartRadius:13,
+        borderTopEndRadius:13,
         alignItems:'center',
-        paddingVertical: '8%',
+        paddingVertical: '5%',
         borderBottomColor:'black',
         borderBottomWidth: 1,
     },
@@ -41,14 +50,11 @@ const styles= StyleSheet.create({
     },
 
     buttons:{
-        fontFamily: 'JetBrainsMono_700Bold',
-        fontSize:15,
         paddingVertical:'3%',
         paddingHorizontal:'5%',
         borderColor: 'black',
         borderWidth:1,
-        margin:'10%',
-        textAlign:'center',
+        marginTop:'10%',
 
         //ios shadow
         shadowColor: "black",
@@ -59,6 +65,43 @@ const styles= StyleSheet.create({
 
         //android shadow
         elevation:4,
+    },
+
+    buttonTexts:{
+        fontFamily: 'JetBrainsMono_700Bold',
+        fontSize:15,
+        textAlign:'center',
+    },
+
+    input:{
+        height: 40,
+        width: '100%',
+        backgroundColor:'#F0F0F0',
+        borderColor: "black",
+        borderWidth: 1,
+    },
+    
+    fieldLabels:{
+        fontFamily:'JetBrainsMono_400Regular',
+        fontSize:13,
+        marginBottom:'3%',
+    },
+
+    fields:{
+        paddingVertical:15,
+    },
+
+    authFooter:{
+        backgroundColor: '#FFD3B6',
+        borderStyle: 'dashed',
+        borderTopColor:'black',
+        borderTopWidth:1,
+        padding:'5%',
+    },
+
+    authFooterText:{
+        fontFamily: 'JetBrainsMono_400Regular',
+        fontSize: 10,
     }
 })
 

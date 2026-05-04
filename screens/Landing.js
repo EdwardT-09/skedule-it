@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
+import { View, Text, Pressable, StyleSheet, ImageBackground, Image } from 'react-native';
 import Header from '../components/Header.js';
 
 import styles from '../assets/style.js';
@@ -13,13 +13,13 @@ export default function Landing({ navigation }) {
         <View style={styles.center}>
             <Header></Header>
             <View style={styles.container}>
-                <View style={styles.titleContainer}>
+                <View style={[styles.titleContainer, { backgroundColor:'#4ECDC4'}]}>
                     <Text style={styles.title}>let's start</Text>
                     <Text style={styles.desc}>start your study journey with us</Text>
                 </View>
-                <View style={{paddingVertical:"10%"}}>
-                    <TouchableOpacity onPress = {() => navigation.navigate('Register')}><Text style={[styles.buttons, { transform: [{ rotate: '3deg' }],}]}>REGISTER</Text></TouchableOpacity>
-                    <TouchableOpacity onPress = {() => navigation.navigate('SignIn')}><Text style={[styles.buttons, { transform: [{ rotate: '-3deg' }],}]}>SIGN IN</Text></TouchableOpacity>
+                <View style={[{paddingVertical:"10%"}, {marginHorizontal:'10%'}]}>
+                    <Pressable onPress = {() => navigation.navigate('Register')} style={({pressed}) => [styles.buttons, { transform: [{ rotate: '3deg' }]}, {backgroundColor: pressed ? '#ddd': 'white' }]}><Text style={styles.buttonTexts}>REGISTER</Text></Pressable>
+                    <Pressable onPress = {() => navigation.navigate('SignIn')} style={({pressed}) => [styles.buttons, { transform: [{ rotate: '-3deg' }]}, {backgroundColor: pressed ? '#ddd': 'white' }]}><Text style={styles.buttonTexts}>SIGN IN</Text></Pressable>
                 </View>
             </View>
         </View>
