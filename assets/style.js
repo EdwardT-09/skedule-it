@@ -7,6 +7,12 @@ const styles= StyleSheet.create({
         textDecorationLine: 'underline',
     },
 
+    errorText:{
+        color:'red',
+        fontSize: 12,
+        fontFamily: 'SpaceGrotesk_400Regular',
+    },
+
     center:{
         flex:1,
         alignItems:'center',
