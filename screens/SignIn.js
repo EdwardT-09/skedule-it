@@ -4,26 +4,37 @@ import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 
 import {isEmpty} from '../util/common.js';
 import {validateEmail, validatePassword} from '../util/validation.js'
+import {onSignIn} from '../database/auth.js';
 import Header from '../components/Header.js';
 import styles from '../assets/style.js';
 
-export default function Register({navigation}) {
+export default function SignIn({navigation}) {
     const [email,setEmail] = useState('');
     const [password,setPassword] = useState('');
-    
+
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
+    const [generalError, setGeneralError] = useState('');
 
-    const handleRegister = () => {
+    const handleSignIn = async () => {
         const emailErr = validateEmail(email);
         const passwordErr = validatePassword(password);
         
         setEmailError(emailErr);
         setPasswordError(passwordErr);
 
-        if(isEmpty(emailError) || isEmpty(passwordError)){
-            return true;
+        if(emailErr === null && passwordErr===null){
+            const error = await onSignIn(email, password);
+            setGeneralError(error);
+            if (error){
+                setGeneralError(error);
+            } 
         }
+
+        if(generalError === null){
+            return navigation.navigate('Home');
+        }
+
         return false;
     }
     return (
@@ -36,7 +47,7 @@ export default function Register({navigation}) {
                         <View style={[styles.container, {marginBottom:100},]}>
                             <View style={[styles.titleContainer, { backgroundColor:'#4ECDC4'}]}>
                                 <Image
-                                source = {require('../assets/stars.png')}></Image>
+                                source = {require('../assets/stars.png')} style={{flex:0, alignSelf:'center'}}></Image>
                                 <Text style={styles.title}>back already?</Text>
                                 <Text style={styles.desc}>continue your study journey with us</Text>
                             </View>
@@ -50,6 +61,7 @@ export default function Register({navigation}) {
                                         <Text style={styles.fieldLabels}>password:</Text>
                                         <TextInput style ={styles.input} secureTextEntry={true} value={password} onChangeText={setPassword}></TextInput>
                                         {passwordError? (<Text style={styles.errorText}>{passwordError}</Text>) : null}
+                                        {generalError? (<Text style={styles.errorText}>{generalError}</Text>) : null}
                                     </View>
                                     <View style={[{flexDirection:'row'}, {alignItems:'center'}, {justifyContent:'space-between'}]}>
                                         <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
@@ -62,7 +74,7 @@ export default function Register({navigation}) {
                                             <Text style={styles.links}>forgot password</Text>
                                         </Pressable>
                                     </View>
-                                    <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {backgroundColor: pressed? "#e4b639" : '#FFE66D'}, {transform: [{rotate: '3deg'}]}]} onPress={handleRegister}>
+                                    <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {backgroundColor: pressed? "#e4b639" : '#FFE66D'}, {transform: [{rotate: '3deg'}]}]} onPress={handleSignIn}>
                                         <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
                                             <Text style={styles.buttonTexts} >LET'S GO </Text>
                                             <Image source={require('../assets/Check.png')}>

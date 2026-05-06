@@ -36,11 +36,17 @@ const styles= StyleSheet.create({
 
     titleContainer:{
         borderTopStartRadius:13,
-        borderTopEndRadius:13,
-        alignItems:'center',
+        borderTopEndRadius:13,     
+        // alignItems:'center',
         paddingVertical: '5%',
         borderBottomColor:'black',
         borderBottomWidth: 1,
+    },
+
+    subtitle:{
+        textAlign:'left',
+        fontFamily: 'JetBrainsMono_400Regular',
+        fontSize:12,
     },
 
     title:{
@@ -108,6 +114,13 @@ const styles= StyleSheet.create({
     authFooterText:{
         fontFamily: 'JetBrainsMono_400Regular',
         fontSize: 10,
+    },
+
+    welcomeText:{
+        fontFamily: 'JetBrainsMono_700Bold',
+        fontSize:24,
+        textAlign: 'center',
+        textDecorationLine:'underline',
     }
 })
 

@@ -36,7 +36,7 @@ export const validatePassword = (password) => {
 export const validatePassword2 = (password, password2) => {
     const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[%&?_#=-])[A-Za-z\d%&?_#=-]{8,}$/;
     if (isEmpty(password2)){
-        return "The password field is empty.";
+        return "The password confirmation field is empty.";
     } 
 
     if(!pattern.test(password2)){

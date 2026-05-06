@@ -8,6 +8,8 @@ import {SpaceGrotesk_400Regular,SpaceGrotesk_700Bold,} from '@expo-google-fonts/
 import Landing from './screens/Landing.js';
 import SignIn from './screens/SignIn.js';
 import Register from './screens/Register.js';
+import Home from './screens/Home.js';
+
 
 
 const Stack = createNativeStackNavigator();
@@ -29,6 +31,7 @@ export default function App(){
         <Stack.Screen name="Landing" component={Landing}></Stack.Screen>
         <Stack.Screen name="SignIn" component={SignIn}></Stack.Screen>
         <Stack.Screen name="Register" component={Register}></Stack.Screen>
+        <Stack.Screen name="Home" component={Home}></Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
 );
