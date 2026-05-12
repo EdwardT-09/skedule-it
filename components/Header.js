@@ -14,7 +14,7 @@ const formattedDate = `${day}, ${date}/${month}/${year}`;
 
 export default function Header(){
     return(
-        <View style={styles.container}>
+        <View style={[styles.container, {marginTop:"13%"}]}>
             <Image source = {require('../assets/logo.png')} style= {styles.logo}></Image>
             <Text style={styles.date}>{formattedDate}</Text>
         </View>

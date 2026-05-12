@@ -121,7 +121,34 @@ const styles= StyleSheet.create({
         fontSize:24,
         textAlign: 'center',
         textDecorationLine:'underline',
-    }
+    },
+
+    navContainer:{
+        position:'absolute',
+        bottom:0,
+        width:'100%',
+        backgroundColor:'white',
+        paddingVertical:30,
+        borderColor:'black',
+        borderWidth:1,
+    },
+
+    navButton:{
+        borderRadius:50,
+        borderColor: 'black',
+        borderWidth:1,
+        padding:10,
+    },
+
+    
+    navActive:{
+        borderRadius:50,
+        borderColor: 'black',
+        borderWidth:1,
+        paddingVertical:10,
+        paddingHorizontal:30,
+    },
+
 })
 
 export default styles;

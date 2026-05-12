@@ -54,14 +54,14 @@ export default function Register({navigation}) {
     return (
             <ScrollView>
             <ImageBackground
-                source = {require('../assets/bg2.png')}
+                source = {require('../assets/bg.png')}
                 style = {{flex:1}}>
                     <View style={styles.center}>
                         <Header></Header>
                         <View style={[styles.container, {marginBottom:100},]}>
-                            <View style={[styles.titleContainer, { backgroundColor:'#4ECDC4'}]}>
+                            <View style={[styles.titleContainer, { backgroundColor:'#4ECDC4'}, {paddingLeft:'7%'}]}>
                                 <Image
-                                source = {require('../assets/stars.png')}></Image>
+                                source = {require('../assets/stars.png')} style={{flex:0, alignSelf:'center'}}></Image>
                                 <Text style={styles.title}>join the club!</Text>
                                 <Text style={styles.desc}>start your study journey with us</Text>
                             </View>
