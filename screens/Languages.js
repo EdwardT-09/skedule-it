@@ -26,6 +26,7 @@ export default function Languages(){
 
             </View>
         </View>
+        <Navigation/>
     </ImageBackground>
     )
 }

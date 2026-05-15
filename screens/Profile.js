@@ -1,12 +1,15 @@
 import React, {useState} from 'react';
-import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView} from "react-native";
+import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView, Switch} from "react-native";
 
 
 import Header from '../components/Header.js';
 import Navigation from '../components/Nav.js';
 import styles from '../assets/style.js';
+import { isEnabled } from 'react-native/Libraries/Performance/Systrace';
 
 export default function Profile({navigation}){
+    const [isEnabled, setIsEnabled] = useState(false);
+    const toggleSwitch = () => setIsEnabled(previousState => !previousState);
     return(
     <ImageBackground source={require('../assets/bg3.png')} style={{flex:1}}>
         <ScrollView>
@@ -22,15 +25,38 @@ export default function Profile({navigation}){
                             </Text>
                         </View>
                     </View>
-                        <Pressable style={({pressed}) => [styles.settingItem, {backgroundColor: pressed? "#e9e9e9" : '#ffffff'},{borderColor:'black', borderBottomWidth:1,flexDirection:'row', alignItems:'center', justifyContent:'space-between'}]}><View style={[{flexDirection:'row'}, {alignItems:'center'}]}><Image source={require('../assets/Globe.png')}></Image><Text style={styles.settingsText}>languages</Text></View><View><Image source={require('../assets/Caret Right.png')}></Image></View></Pressable>
-                    <View style={{paddingHorizontal:'5%', paddingVertical:'4%', borderColor:'black', borderBottomWidth:1}}>
-                        <Pressable style={({pressed}) => [styles.settingItem, {backgroundColor: pressed? "#e9e9e9" : '#ffffff'},{borderColor:'black', borderBottomWidth:1,flexDirection:'row', alignItems:'center', justifyContent:'space-between'}]}><View style={[{flexDirection:'row'}, {alignItems:'center'}]}><Image source={require('../assets/Bell.png')}></Image><Text style={styles.settingsText}>notification</Text></View><View><Image source={require('../assets/Caret Right.png')}></Image></View></Pressable>
-                    </View>
-                    <View style={{paddingHorizontal:'5%', paddingVertical:'4%', borderColor:'black', borderBottomWidth:1}}>
-                        <Pressable style={({pressed}) => [styles.settingItem, {backgroundColor: pressed? "#e9e9e9" : '#ffffff'},{borderColor:'black', borderBottomWidth:1,flexDirection:'row', alignItems:'center', justifyContent:'space-between'}]}><View style={[{flexDirection:'row'}, {alignItems:'center'}]}><Image source={require('../assets/Key.png')}></Image><Text style={styles.settingsText}>change password</Text></View><View><Image source={require('../assets/Caret Right.png')}></Image></View></Pressable>
-                    </View>
+                        <Pressable onPress={ () => {navigation.navigate('Languages')}} style={({pressed}) => [styles.settingItem, {backgroundColor: pressed? "#e9e9e9" : '#ffffff'},{borderColor:'black', borderBottomWidth:1,flexDirection:'row', alignItems:'center', justifyContent:'space-between'}]}>
+                            <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
+                                <Image source={require('../assets/Globe.png')}></Image>
+                                <Text style={styles.settingsText}>languages</Text>
+                            </View>
+                            <View>
+                                <Image source={require('../assets/Caret Right.png')}></Image>
+                                </View>
+                        </Pressable>
+                        <View style={[styles.settingItem,{borderColor:'black', borderBottomWidth:1,flexDirection:'row', alignItems:'center', justifyContent:'space-between'}]}>
+                            <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
+                                <Image source={require('../assets/Bell.png')}></Image>
+                                <Text style={styles.settingsText}>notification</Text>
+                            </View>
+                            <View>
+                                <Switch trackColor={{false: 'gray', true: 'gray'}} thumbColor={isEnabled? 'black' : 'white'} onValueChange={toggleSwitch} value={isEnabled}></Switch>
+                            </View>
+                        </View>
+                        <Pressable onPress={()=>{navigation.navigate('Password')}} style={({pressed}) => [styles.settingItem, {backgroundColor: pressed? "#e9e9e9" : '#ffffff'},{borderColor:'black', borderBottomWidth:1,flexDirection:'row', alignItems:'center', justifyContent:'space-between'}]}>
+                            <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
+                                <Image source={require('../assets/Key.png')}></Image>
+                                <Text style={styles.settingsText}>change password</Text>
+                            </View>
+                            <View>
+                                <Image source={require('../assets/Caret Right.png')}></Image>
+                            </View>
+                        </Pressable>
                     <View style={{paddingLeft:'3%', paddingVertical:'4%', flex:0, justifyContent:'center', alignItems:'center'}}>
-                        <View style={[{flexDirection:'row'}, {alignItems:'center'}]}><Image source={require('../assets/Log out.png')}></Image><Text style={[styles.settingsText,{color:'#c14343'}]}>logout</Text></View>
+                        <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
+                            <Image source={require('../assets/Log out.png')}></Image>
+                            <Text style={[styles.settingsText,{color:'#c14343'}]}>logout</Text>
+                        </View>
                     </View>
 
                 </View>

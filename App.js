@@ -11,6 +11,7 @@ import Register from './screens/Register.js';
 import Home from './screens/Home.js';
 import Profile from './screens/Profile.js';
 import Languages from './screens/Languages.js';
+import Password from './screens/Password.js';
 
 
 const Stack = createNativeStackNavigator();
@@ -28,13 +29,14 @@ export default function App(){
   }
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='Languages' screenOptions={{ headerShown: false, }}>
+      <Stack.Navigator initialRouteName='Password' screenOptions={{ headerShown: false, }}>
         <Stack.Screen name="Landing" component={Landing}></Stack.Screen>
         <Stack.Screen name="SignIn" component={SignIn}></Stack.Screen>
         <Stack.Screen name="Register" component={Register}></Stack.Screen>
         <Stack.Screen name="Home" component={Home}></Stack.Screen>
         <Stack.Screen name="Profile" component={Profile}></Stack.Screen>
         <Stack.Screen name="Languages" component={Languages}></Stack.Screen>
+        <Stack.Screen name="Password" component={Password}></Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
 );
