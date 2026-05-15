@@ -121,7 +121,54 @@ const styles= StyleSheet.create({
         fontSize:24,
         textAlign: 'center',
         textDecorationLine:'underline',
+        textTransform: 'uppercase',
+    },
+
+    navContainer:{
+        position:'absolute',
+        bottom:0,
+        width:'100%',
+        backgroundColor:'white',
+        paddingVertical:30,
+        borderColor:'black',
+        borderWidth:1,
+    },
+
+    navButton:{
+        borderRadius:50,
+        borderColor: 'black',
+        borderWidth:1,
+        padding:10,
+    },
+
+    
+    navActive:{
+        borderRadius:50,
+        borderColor: 'black',
+        borderWidth:1,
+        paddingVertical:10,
+        paddingHorizontal:30,
+    },
+
+
+    //profile
+    profileText:{
+        fontFamily:'SpaceGrotesk_700Bold',
+        fontSize:28,
+        textAlign:'center',
+    },
+
+    settingsText:{
+        fontFamily: 'JetBrainsMono_400Regular',
+        fontSize:14,
+        paddingLeft:'3%',
+    },
+
+    settingItem:{
+        paddingHorizontal:'5%',
+        paddingVertical:'4%',
     }
+
 })
 
 export default styles;

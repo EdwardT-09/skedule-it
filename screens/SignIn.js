@@ -16,7 +16,10 @@ export default function SignIn({navigation}) {
     const [passwordError, setPasswordError] = useState('');
     const [generalError, setGeneralError] = useState('');
 
+    const [loading,setLoading] = useState('');
     const handleSignIn = async () => {
+        if(loading) return;
+
         const emailErr = validateEmail(email);
         const passwordErr = validatePassword(password);
         
@@ -24,28 +27,35 @@ export default function SignIn({navigation}) {
         setPasswordError(passwordErr);
 
         if(emailErr === null && passwordErr===null){
+            setLoading(true);
+            try{
             const error = await onSignIn(email, password);
-            setGeneralError(error);
-            if (error){
-                setGeneralError(error);
-            } 
+            if(error === null){
+            console.log('Hello');
+           return navigation.navigate('Home');
+        } else{
+            console.log('Failed');
         }
+        } catch(e){
+            setGeneralError(error);}
+            finally{
+                setLoading(false);
+            }
 
-        if(generalError === null){
-            return navigation.navigate('Home');
+
         }
-
         return false;
+
     }
     return (
             <ScrollView>
             <ImageBackground
-                source = {require('../assets/bg2.png')}
+                source = {require('../assets/bg.png')}
                 style = {{flex:1}}>
                     <View style={styles.center}>
                         <Header></Header>
                         <View style={[styles.container, {marginBottom:100},]}>
-                            <View style={[styles.titleContainer, { backgroundColor:'#4ECDC4'}]}>
+                            <View style={[styles.titleContainer, { backgroundColor:'#4ECDC4'}, {paddingLeft:'7%'}]}>
                                 <Image
                                 source = {require('../assets/stars.png')} style={{flex:0, alignSelf:'center'}}></Image>
                                 <Text style={styles.title}>back already?</Text>

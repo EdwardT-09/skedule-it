@@ -13,7 +13,7 @@ export default function Landing({ navigation }) {
         <View style={styles.center}>
             <Header></Header>
             <View style={styles.container}>
-                <View style={[styles.titleContainer, { backgroundColor:'#4ECDC4'}]}>
+                <View style={[styles.titleContainer, { backgroundColor:'#4ECDC4'}, {paddingLeft:'7%'}]}>
                     <Text style={styles.title}>let's start</Text>
                     <Text style={styles.desc}>start your study journey with us</Text>
                 </View>
