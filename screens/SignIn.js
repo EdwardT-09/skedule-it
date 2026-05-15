@@ -16,7 +16,10 @@ export default function SignIn({navigation}) {
     const [passwordError, setPasswordError] = useState('');
     const [generalError, setGeneralError] = useState('');
 
+    const [loading,setLoading] = useState('');
     const handleSignIn = async () => {
+        if(loading) return;
+
         const emailErr = validateEmail(email);
         const passwordErr = validatePassword(password);
         
@@ -24,18 +27,25 @@ export default function SignIn({navigation}) {
         setPasswordError(passwordErr);
 
         if(emailErr === null && passwordErr===null){
+            setLoading(true);
+            try{
             const error = await onSignIn(email, password);
-            setGeneralError(error);
-            if (error){
-                setGeneralError(error);
-            } 
+            if(error === null){
+            console.log('Hello');
+           return navigation.navigate('Home');
+        } else{
+            console.log('Failed');
         }
+        } catch(e){
+            setGeneralError(error);}
+            finally{
+                setLoading(false);
+            }
 
-        if(generalError === null){
-            return navigation.navigate('Home');
+
         }
-
         return false;
+
     }
     return (
             <ScrollView>

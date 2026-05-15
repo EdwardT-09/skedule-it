@@ -1,20 +1,47 @@
-import React from 'react';
-import {View, Text, ImageBackground,Image} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Text, ImageBackground,Image, ScrollView} from 'react-native';
 
-
+import {supabase} from '../config/initSupabase.js'
 import Header from '../components/Header.js';
-import Navigation from '../components/Navigation.js';
+import Navigation from '../components/Nav.js';
 import styles from '../assets/style.js';
 
 export default function Home(){
+    const [username, setUsername] = useState();
+
+    useEffect(()=>{
+        fetchUser();
+    },[])
+    async function fetchUser(){
+
+        const {
+            data: {user}
+        } = await supabase.auth.getUser();
+
+        if(!user) return;
+
+        const {data, error} = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', user.id)
+        .single();
+        
+        if(data){
+            setUsername(data.username);
+        }
+
+        if(error){
+            console.log(error);
+        }
+    }
     return(
         <ImageBackground
-            source= {require('../assets/bg.png')}
+            source= {require('../assets/bg3.png')}
             style={{flex:1}}>
         <Header></Header>
         <View style={styles.center}>
             <Text style={styles.welcomeText}>
-                WELCOME BACK, USERNAME2026
+                WELCOME BACK, {username || 'STUDENT'}
             </Text>
             <View style={[styles.container, {marginTop:'10%'}]}>
                 <View style={[styles.titleContainer,{backgroundColor:'#FFE66D'}]}>
@@ -26,9 +53,12 @@ export default function Home(){
                         </Text>
                     </View>
                 </View>
-                <Text>
-                Hello
-                </Text>
+                <ScrollView style={{height:"40%"}}>
+                    <Text>
+                    Hello
+                    </Text>
+                    
+                </ScrollView>
             </View>
         </View>
         <Navigation></Navigation>

@@ -121,6 +121,7 @@ const styles= StyleSheet.create({
         fontSize:24,
         textAlign: 'center',
         textDecorationLine:'underline',
+        textTransform: 'uppercase',
     },
 
     navContainer:{
@@ -148,6 +149,25 @@ const styles= StyleSheet.create({
         paddingVertical:10,
         paddingHorizontal:30,
     },
+
+
+    //profile
+    profileText:{
+        fontFamily:'SpaceGrotesk_700Bold',
+        fontSize:28,
+        textAlign:'center',
+    },
+
+    settingsText:{
+        fontFamily: 'JetBrainsMono_400Regular',
+        fontSize:14,
+        paddingLeft:'3%',
+    },
+
+    settingItem:{
+        paddingHorizontal:'5%',
+        paddingVertical:'4%',
+    }
 
 })
 
