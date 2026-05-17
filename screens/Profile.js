@@ -1,15 +1,63 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView, Switch} from "react-native";
 
-
+import {supabase} from '../config/initSupabase.js';
 import Header from '../components/Header.js';
 import Navigation from '../components/Nav.js';
 import styles from '../assets/style.js';
-import { isEnabled } from 'react-native/Libraries/Performance/Systrace';
 
 export default function Profile({navigation}){
     const [isEnabled, setIsEnabled] = useState(false);
-    const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+   
+    useEffect(()=>{
+            fetchNotification();
+    },[])
+
+    const saveNotification = async() => {
+        const toggle = !isEnabled;
+        setIsEnabled(toggle);
+        
+        const user = (await supabase.auth.getUser()).data.user;
+
+        if (!user) console.log('No User 1');
+
+        const {data, error} = await supabase
+            .from('profiles')
+            .upsert({
+                id:user?.id,
+                notification: toggle,
+            })
+
+            if(error){
+                console.log(error);
+            }
+
+            console.log('saved');
+    }
+
+    const fetchNotification = async() => {
+
+
+        const user = (await supabase.auth.getUser()).data.user;
+
+        if (!user) console.log('No User 2');
+
+        const {data, error} = await supabase
+            .from('profiles')
+            .select('notification')
+            .eq('id', user.id)
+            .single();
+
+        console.log(data.notification);
+        if(data){
+            setIsEnabled(data.notification);
+        }
+
+        if(error){
+            console.log('Error: Notification Fetching');
+        }
+
+    }
     return(
     <ImageBackground source={require('../assets/bg3.png')} style={{flex:1}}>
         <ScrollView>
@@ -40,7 +88,7 @@ export default function Profile({navigation}){
                                 <Text style={styles.settingsText}>notification</Text>
                             </View>
                             <View>
-                                <Switch trackColor={{false: 'gray', true: 'gray'}} thumbColor={isEnabled? 'black' : 'white'} onValueChange={toggleSwitch} value={isEnabled}></Switch>
+                                <Switch trackColor={{false: 'gray', true: 'gray'}} thumbColor={isEnabled? 'black' : 'white'} onValueChange={saveNotification} value={isEnabled}></Switch>
                             </View>
                         </View>
                         <Pressable onPress={()=>{navigation.navigate('Password')}} style={({pressed}) => [styles.settingItem, {backgroundColor: pressed? "#e9e9e9" : '#ffffff'},{borderColor:'black', borderBottomWidth:1,flexDirection:'row', alignItems:'center', justifyContent:'space-between'}]}>
