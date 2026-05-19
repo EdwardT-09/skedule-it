@@ -2,51 +2,98 @@ import React, {useState} from 'react';
 import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView} from "react-native";
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 
+import {supabase} from '../config/initSupabase.js';
+import {validatePassword, validatePassword2 } from '../util/validation.js';
 import Header from '../components/Header.js';
 import Navigation from '../components/Nav.js';
 import styles from '../assets/style.js';
 
 export default function Password(){
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    const [currentPasswordError, setCurrentPasswordError] = useState('');
+    const [newPasswordError, setNewPasswordError] = useState('');
+    const [confirmPasswordError, setConfirmPasswordError] = useState('');
+
+    const changePassword = async() => {
+                
+        const user = (await supabase.auth.getUser()).data.user;
+
+        if(!user) return;
+
+        const currentPasswordErr =  validatePassword(currentPassword);
+        const newPasswordErr =  validatePassword(newPassword);
+        const confirmPasswordErr =  validatePassword(newPassword, confirmPassword);
+
+        setCurrentPasswordError(currentPasswordErr);
+        setNewPasswordError(newPasswordErr);
+        setConfirmPasswordError(confirmPasswordErr);
+
+        console.log('Yes');
+        if(currentPasswordErr === null && newPasswordErr === null && confirmPasswordErr === null){
+                 console.log('Yes2');
+        const {data, error} = await supabase.auth.signInWithPassword({
+            email: user.email,
+            password: currentPassword,
+        })
+                         console.log('Yes3');
+            if(data){
+                                    console.log('Yes4');
+                    const {data, error} = await supabase.auth.updateUser({
+                        password : confirmPassword
+                    })
+                    console.log("SAVED");
+                } else {
+                    setCurrentPasswordError('The current password provided is incorrect.', error);
+                    console.log(error);
+                }
+        }
+        
+    }
     return(
     <ImageBackground source={require('../assets/bg3.png')} style={{flex:1}}>
-
-        <Header/>
-        <View style={{flex:0, justifyContent:'center', alignItems:'center'}}>
-            <View style={[styles.container, {marginTop:'10%'}]}>
-                <View style={[styles.titleContainer,{backgroundColor:'#c14343'}]}>
-                    <View style={{paddingLeft: '5%'}}>
-                        <Text style={styles.subtitle}>settings</Text>
-                        <Text style={styles.title}>
-                            change password
-                        </Text>
+        <ScrollView>
+            <Header/>
+            <View style={{flex:0, justifyContent:'center', alignItems:'center'}}>
+                <View style={[styles.container, {marginTop:'10%', marginBottom:'8%'}]}>
+                    <View style={[styles.titleContainer,{backgroundColor:'#c14343'}]}>
+                        <View style={{paddingLeft: '5%'}}>
+                            <Text style={styles.subtitle}>settings</Text>
+                            <Text style={styles.title}>
+                                change password
+                            </Text>
+                        </View>
                     </View>
-                </View>
-                <ScrollView>
-                    <SafeAreaView style={{paddingHorizontal: 15}}>
-                        <View style={styles.fields}>
-                            <Text style={styles.fieldLabels}>Current Password: </Text>
-                            <TextInput style={styles.input}></TextInput>
-                        </View>
-                        <View style={styles.fields}>
-                            <Text style={styles.fieldLabels}>New Password: </Text>
-                            <TextInput style={styles.input}></TextInput>
-                        </View>
-                        <View style={styles.fields}>
-                            <Text style={styles.fieldLabels}>Confirm New Password: </Text>
-                            <TextInput style={styles.input}></TextInput>
-                        </View>
-                        <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {backgroundColor: pressed? "#e4b639" : '#FFE66D'}, {transform: [{rotate: '3deg'}]}]}>
-                            <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
-                                <Text style={styles.buttonTexts} >LET'S GO </Text>
-                                <Image source={require('../assets/Check.png')}>
-                                </Image>
+                        <SafeAreaView style={{paddingHorizontal: 15}}>
+                            <View style={styles.fields}>
+                                <Text style={styles.fieldLabels}>Current Password: </Text>
+                                <TextInput style={styles.input} secureTextEntry={true} value={currentPassword} onChangeText={setCurrentPassword}></TextInput>
+                                {currentPasswordError? (<Text style={styles.errorText}>{currentPasswordError}</Text>) : null}
                             </View>
-                        </Pressable>
-                    </SafeAreaView>
-                </ScrollView>
+                            <View style={styles.fields}>
+                                <Text style={styles.fieldLabels}>New Password: </Text>
+                                <TextInput style={styles.input} secureTextEntry={true} value={newPassword} onChangeText={setNewPassword}></TextInput>
+                                {newPasswordError? (<Text style={styles.errorText}>{newPasswordError}</Text>) : null}
+                            </View>
+                            <View style={styles.fields}>
+                                <Text style={styles.fieldLabels}>Confirm New Password: </Text>
+                                <TextInput style={styles.input} secureTextEntry={true} value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>
+                                {confirmPasswordError? (<Text style={styles.errorText}>{confirmPasswordError}</Text>) : null}
+                            </View>
+                            <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {backgroundColor: pressed? "#e4b639" : '#FFE66D'}, {transform: [{rotate: '3deg'}]}]} onPress={changePassword}>
+                                <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
+                                    <Text style={styles.buttonTexts} >LET'S GO </Text>
+                                    <Image source={require('../assets/Check.png')}>
+                                    </Image>
+                                </View>
+                            </Pressable>
+                        </SafeAreaView>
 
+                </View>
             </View>
-        </View>
+        </ScrollView>
 
         
     </ImageBackground>
