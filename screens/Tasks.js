@@ -14,12 +14,12 @@ export default function Tasks ({navigation}){
                 <View style={[styles.titleContainer,{backgroundColor:'#c14343'}]}>
                     <Image source={require('../assets/Pin.png')} style={{flex:0, alignSelf:'center',width:16, height:16}}></Image>
                     <View style={{paddingHorizontal: '5%'}}>
-                        <Text style={styles.subtitle}>settings</Text>
+                        <Text style={styles.subtitle}>let's go</Text>
                         <View style={{flex:0, flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
                             <Text style={styles.title}>
-                                tasks for the day
+                                tasks
                             </Text>
-                            <Pressable style={({pressed})=>[styles.addButton,{backgroundColor: pressed? '#c49832': '#efd868'}]}><Image source={require('../assets/Plus.png')}></Image></Pressable>
+                            <Pressable onPress = {() => navigation.navigate('AddTask')} style={({pressed})=>[styles.addButton,{backgroundColor: pressed? '#c49832': '#efd868'}]}><Image source={require('../assets/Plus.png')}></Image></Pressable>
                         </View>
                     </View>
                 </View>
