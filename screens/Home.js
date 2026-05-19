@@ -48,9 +48,12 @@ export default function Home(){
                     <Image source={require('../assets/Pin.png')} style={{flex:0, alignSelf:'center',width:16, height:16}}></Image>
                     <View style={{paddingLeft: '5%'}}>
                         <Text style={styles.subtitle}>let's go</Text>
-                        <Text style={styles.title}>
-                            tasks for the day
-                        </Text>
+                        <View style={{flex:0, flexDirection:'row'}}>
+                            <Text style={styles.title}>
+                                tasks for the day
+                            </Text>
+                            <Image source={require('../assets/Plus.png')}></Image>
+                        </View>
                     </View>
                 </View>
                 <ScrollView style={{height:"40%"}}>

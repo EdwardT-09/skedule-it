@@ -2,9 +2,16 @@ import { StyleSheet } from "react-native";
 
 
 const styles= StyleSheet.create({
+
     links:{
         color:'#4ECDC4',
         textDecorationLine: 'underline',
+    },
+
+    addButton:{
+        borderColor:'gray',
+        borderWidth:1,
+        padding:'3%',
     },
 
     errorText:{
@@ -124,6 +131,8 @@ const styles= StyleSheet.create({
         textTransform: 'uppercase',
     },
 
+    //navigation
+
     navContainer:{
         position:'absolute',
         bottom:0,
@@ -168,6 +177,7 @@ const styles= StyleSheet.create({
         paddingHorizontal:'5%',
         paddingVertical:'4%',
     }
+
 
 })
 
