@@ -31,7 +31,7 @@ export default function App(){
   }
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='Tasks' screenOptions={{ headerShown: false, }}>
+      <Stack.Navigator initialRouteName='Landing' screenOptions={{ headerShown: false, }}>
         <Stack.Screen name="Landing" component={Landing}></Stack.Screen>
         <Stack.Screen name="SignIn" component={SignIn}></Stack.Screen>
         <Stack.Screen name="Register" component={Register}></Stack.Screen>

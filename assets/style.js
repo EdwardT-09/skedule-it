@@ -8,8 +8,8 @@ const styles= StyleSheet.create({
         textDecorationLine: 'underline',
     },
 
-    addButton:{
-        borderColor:'gray',
+    borderButton:{
+        borderColor:'black',
         borderWidth:1,
         padding:'3%',
     },
@@ -98,6 +98,8 @@ const styles= StyleSheet.create({
         backgroundColor:'#F0F0F0',
         borderColor: "black",
         borderWidth: 1,
+        fontFamily:'JetBrainsMono_400Regular',
+        fontSize:11,
     },
     
     fieldLabels:{
@@ -176,6 +178,47 @@ const styles= StyleSheet.create({
     settingItem:{
         paddingHorizontal:'5%',
         paddingVertical:'4%',
+    },
+
+    //priority pop up 
+    priorityPopBack:{
+        flex:1,
+        justifyContent:'center',
+        alignItems:'center',
+        backgroundColor:'#00000050'
+    },
+
+    priorityPopContainer:{
+        backgroundColor:'white',
+        width:'80%',
+        height:'60%',
+        borderColor:'black',
+        borderWidth:1,
+        borderRadius:20
+    },
+
+    priorityTitle:{
+        fontFamily:'JetBrainsMono_700Bold',
+        fontSize:32,
+        textAlign:'center',
+    },
+
+
+    //tasks
+    taskItem:{
+        borderColor:'black',
+        borderBottomWidth:1,
+        padding:'3%',
+    },
+
+    taskMenuContainer:{
+        backgroundColor:'white',
+        borderColor:'black',
+        borderWidth:1,
+        width:170,
+        height:170,
+        position:"absolute",
+        padding:10,
     }
 
 

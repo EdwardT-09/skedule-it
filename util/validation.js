@@ -49,3 +49,33 @@ export const validatePassword2 = (password, password2) => {
     return null;
 };
 
+export const validateTitle = (title) =>{
+    if(isEmpty(title)){
+        console.log('validate title')
+        return "The title field is empty";
+    }
+
+    return null;
+}
+
+export const validateDate = (date) =>{
+    const currentDate = new Date();
+  
+    date.setHours(0,0,0,0);
+    currentDate.setHours(0,0,0,0);
+
+    if(date < currentDate){
+        console.log('validate date')
+        return "The date field must be from"+ currentDate.getDate() +"/"+  (currentDate.getMonth() + 1) + "/" + currentDate.getFullYear() + "onwards";
+    }
+
+    return null;
+}
+
+export const validatePriority = (priority) =>{
+    if(isEmpty(priority)){
+        console.log('validate priority');
+        return "The priority field is empty";
+    }
+    return null;
+}

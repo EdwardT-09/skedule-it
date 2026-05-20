@@ -33,6 +33,7 @@ export default function Register({navigation}) {
         setPasswordError(passwordErr);
         setPassword2Error(password2Err);
         setGeneralError(typeof password2Err);
+        
         if(usernameErr === null && emailErr === null && passwordErr === null && password2Err === null){
             setGeneralError("HI55");
             const error = await onRegister(username, email, password);
