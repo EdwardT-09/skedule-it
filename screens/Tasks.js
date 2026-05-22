@@ -29,7 +29,7 @@ export default function Tasks ({navigation}){
 
         const {data, error} = await supabase
             .from('tasks')
-            .select('title, date, recurring, priority')
+            .select('id, title, date, recurring, priority')
             .eq('user_id', user.id)
 
         if(data){

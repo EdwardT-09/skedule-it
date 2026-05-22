@@ -37,8 +37,13 @@ const styles= StyleSheet.create({
         width: '90%',
         backgroundColor: '#fff',
         borderRadius: 15,
-        borderColor:'black',
-        borderWidth: 1,
+        // borderColor:'black',
+        // borderWidth: 1,
+        elevation:10,
+        shadowColor: '#000', 
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
 
     titleContainer:{
@@ -139,26 +144,37 @@ const styles= StyleSheet.create({
         position:'absolute',
         bottom:0,
         width:'100%',
-        backgroundColor:'white',
+        backgroundColor:'rgb(249, 249, 249)',
         paddingVertical:30,
-        borderColor:'black',
-        borderWidth:1,
+        // borderColor:'black',
+        // borderWidth:1,
+        borderRadius:20,
+        elevation:10,
+        shadowColor: '#000', 
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+
     },
 
     navButton:{
         borderRadius:50,
-        borderColor: 'black',
-        borderWidth:1,
+        // borderColor: 'black',
+        // borderWidth:1,
         padding:10,
+    },
+
+    navLabel:{
+        fontFamily: 'JetBrainsMono_400Regular',
+        fontSize:11,
     },
 
     
     navActive:{
         borderRadius:50,
-        borderColor: 'black',
-        borderWidth:1,
-        paddingVertical:10,
-        paddingHorizontal:30,
+        // borderColor: 'black',
+        // borderWidth:1,
+        padding:10,
     },
 
 

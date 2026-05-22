@@ -35,7 +35,7 @@ export default function Home(){
         }
     }
     return(
-        <ImageBackground source={require('../assets/bg4.jpg')} imageStyle={{opacity:0.4}} style={{flex:1}}>
+        <ImageBackground source={require('../assets/bg4.jpg')} imageStyle={{opacity:0.15}} style={{flex:1}}>
         <Header></Header>
         <View style={styles.center}>
             <Text style={styles.welcomeText}>
