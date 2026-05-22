@@ -54,9 +54,7 @@ export default function Register({navigation}) {
     }
     return (
             <ScrollView>
-            <ImageBackground
-                source = {require('../assets/bg.png')}
-                style = {{flex:1}}>
+            <ImageBackground source={require('../assets/bg4.jpg')} imageStyle={{opacity:0.4}} style={{flex:1}}>
                     <View style={styles.center}>
                         <Header></Header>
                         <View style={[styles.container, {marginBottom:100},]}>

@@ -59,7 +59,7 @@ export default function Profile({navigation}){
 
     }
     return(
-    <ImageBackground source={require('../assets/bg3.png')} style={{flex:1}}>
+        <ImageBackground source={require('../assets/bg4.jpg')} imageStyle={{opacity:0.4}} style={{flex:1}}>
         <ScrollView>
             <View style={{flex:0, justifyContent:'center', alignItems:'center'}}>
                 <Header></Header>

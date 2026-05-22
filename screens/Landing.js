@@ -7,9 +7,7 @@ import styles from '../assets/style.js';
 
 export default function Landing({ navigation }) {
   return (
-    <ImageBackground 
-        source = {require ('../assets/bg3.png')}
-        style={{flex:1}}>
+        <ImageBackground source={require('../assets/bg4.jpg')} imageStyle={{opacity:0.4}} style={{flex:1}}>
         <View style={styles.center}>
             <Header></Header>
             <View style={styles.container}>
