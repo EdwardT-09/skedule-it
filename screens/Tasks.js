@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, Pressable, Modal, StyleSheet, ImageBackground, Image, ScrollView} from 'react-native';
-
+import { View, Text, Pressable, StyleSheet, ImageBackground, Image, ScrollView} from 'react-native';
+import Modal from 'react-native-modal'
 import {supabase} from '../config/initSupabase.js';
 import Header from '../components/Header.js';
 import Nav from '../components/Nav.js';
@@ -60,12 +60,13 @@ export default function Tasks ({navigation}){
                             <Text style={styles.title}>
                                 tasks
                             </Text>
-                            <Pressable onPress = {() => navigation.navigate('AddTask')} style={({pressed})=>[styles.borderButton,{backgroundColor: pressed? '#c49832': '#efd868'}]}><Image source={require('../assets/Plus.png')}></Image></Pressable>
+                            <Pressable onPress = {() => navigation.navigate('AddTask')} style={({pressed})=>[styles.borderButton,{backgroundColor: pressed? '#c49832': '#efd868'}]}>
+                                <Image source={require('../assets/Plus.png')} style={{width:20, height:20}}></Image></Pressable>
                         </View>
                     </View>
                 </View>
                     <ScrollView style={{height:'50%'}}>
-                        <Text>This Week</Text>
+                        <Text style={styles.timeLabel}>this week</Text>
                         {tasks.map((task)=> (<View style={styles.taskItem} key={task.id}><View style={{flex:0, flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}><Text>{task.title}</Text><View style={{flex:0, flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}><Text style={{borderColor:priorityColors[task.priority], borderWidth:1, padding:'1%', color:priorityColors[task.priority]}}>{task.priority}</Text>
                         {/* get the position of the menu */}
                         <Pressable ref={menuRef} onPress={()=> menuRef.current.measure((px, py) => {
@@ -76,10 +77,9 @@ export default function Tasks ({navigation}){
                             //does not use !menuVisible as the menu will be inaccessible when the popup appears
                             setMenuVisible(!menuVisible);
                         })}><Image source={require('../assets/Menu.png')} style={{height:24, width:24, marginLeft:'2%'}}></Image></Pressable></View></View>
-                    {/* {menuVisible && selectedTask == task.id &&
-                                <View style={[styles.taskMenuContainer, {top:menuPos.y + 20, right:menuPos.x}]}><Text>Hello</Text></View>
-
-                    } */}
+     
+                                
+                    
 </View>
                         ))}        
                     </ScrollView>
@@ -87,7 +87,26 @@ export default function Tasks ({navigation}){
             </View>
         </View>
         <Nav></Nav>
-        
+        <Modal style={{justifyContent: 'flex-end', margin:0}} transparent={true} isVisible={menuVisible} swipeDirection="down" onSwipeComplete={()=> setMenuVisible(false)} onBackdropPress={()=> setMenuVisible(false)} propagateSwipe={true}>
+            <View style={[styles.taskMenuContainer]}>
+                <Text style={{textDecorationLine:'underline', flex:0, justifyContent:'center', alignSelf:'center'}}>           </Text>
+                <View>
+                    <Pressable style={({pressed})=> ([styles.taskMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
+                        <Image source={require('../assets/Edit.png')} style={styles.taskMenuImage}></Image>
+                        <Text style={styles.taskMenuLabels}>edit</Text>
+                    </Pressable>
+                    <Pressable style={({pressed})=> ([styles.taskMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
+                        <Image source={require('../assets/Plus.png')} style={[styles.taskMenuImage, {width:36, height:36}]}></Image>
+                        <Text style={styles.taskMenuLabels}>add new subtask</Text>
+                    </Pressable>
+                    <Pressable style={({pressed})=> ([styles.taskMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
+                        <Image source={require('../assets/Trash.png')} style={styles.taskMenuImage}></Image>
+                        <Text style={[styles.taskMenuLabels, {color:'#c14343'}]}>delete</Text>
+                    </Pressable>
+                </View>
+            </View>
+        </Modal>
+
         </ImageBackground>
         
 

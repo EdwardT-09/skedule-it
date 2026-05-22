@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, ImageBackground,Image, ScrollView} from 'react-native';
+import {View, Text, ImageBackground,Image, ScrollView, Pressable} from 'react-native';
 
 import {supabase} from '../config/initSupabase.js'
 import Header from '../components/Header.js';

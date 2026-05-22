@@ -228,14 +228,46 @@ const styles= StyleSheet.create({
     },
 
     taskMenuContainer:{
-        backgroundColor:'white',
-        borderColor:'black',
-        borderWidth:1,
-        width:170,
-        height:170,
+        backgroundColor:'rgb(255, 255, 255)',
+        // borderColor:'black',
+        // borderWidth:1,
+        borderTopEndRadius:25,
+        borderTopLeftRadius:25,
+        width:'100%',
+        height:'35%',
         position:"absolute",
+        bottom:0,
         padding:10,
-    }
+        elevation:10,
+    },
+
+    taskMenuItem:{
+        flex:0,
+        flexDirection:'row',
+        alignItems:'center',
+        borderColor:'gray',
+        borderBottomWidth:1
+    },
+
+    timeLabel:{
+        fontFamily: 'SpaceGrotesk_700Bold',
+        fontSize:28,
+        paddingLeft:10,
+    },
+
+    taskMenuImage:{
+        marginVertical:'5%',
+        marginRight:'5%',
+    },
+
+    taskMenuLabels:{
+        fontSize:16,
+        fontFamily: 'JetBrainsMono_400Regular',
+    },
+
+
+
+
 
 
 })
