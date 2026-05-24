@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { View, Text, Modal, Pressable, StyleSheet, ImageBackground, Image, ScrollView, TextInput, Button} from 'react-native';
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -10,7 +10,7 @@ import Header from '../components/Header.js';
 import Nav from '../components/Nav.js';
 import styles from '../assets/style.js';
 
-export default function AddTask ({navigation}){
+export default function AddTask ({navigation, route}){
     const [title, setTitle] = useState('');
 
     const [date, setDate] = useState(new Date());
@@ -18,7 +18,7 @@ export default function AddTask ({navigation}){
     const [show,setShow] = useState(false);
 
 
-     const [days, setDays] = useState([]);
+    const [days, setDays] = useState([]);
     const [priority, setPriority] = useState('Q4');
 
     const [titleError, setTitleError] = useState('');
@@ -28,7 +28,71 @@ export default function AddTask ({navigation}){
     //used to determine whether the priority tip popup is open or closed
     const [tips, setTips] = useState(false);
 
+    const [level, setLevel] = useState();
+
     const weekDay = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    const taskID = route?.params?.taskID;
+    const method = route?.params?.method;
+
+    console.log(taskID);
+     useEffect(()=> {
+        if(taskID && method == 'Edit'){
+            editTask();
+        } else if (taskID && method == 'Add Subtask') {
+            addSubTask();
+        }
+    }, [taskID])
+
+    const editTask = async() =>{
+
+        const user = (await supabase.auth.getUser()).data.user;
+
+        if(!user) return;
+ 
+        const {data, error} = await supabase
+            .from('tasks')
+            .select(
+                'title, date, recurring, priority'
+            )
+            .eq('user_id', user.id)
+            .eq('id', taskID)
+            .single()
+
+        console.log(data)
+        
+        if(error){
+            console.log(error);
+        }
+
+        setTitle(data.title)
+        setDate(new Date(data.date))
+        setDays(data.recurring)
+        setPriority(data.priority);
+    }
+
+    const addSubTask = async() => {
+        const user = (await supabase.auth.getUser()).data.user;
+
+        if(!user) return;
+        
+        const {data, error} = await supabase
+            .from('tasks')
+            .select(
+                'level'
+            )
+            .eq('user_id', user.id)
+            .eq('id', taskID)
+            .single()
+
+            if(error){
+            console.log(error);
+            }
+
+
+        setLevel(data.level);
+    }
+
 
     const toggleDay = (day) =>{
         setDays((prev)=>
@@ -66,26 +130,64 @@ export default function AddTask ({navigation}){
     }
 
     const submitTask = async() => {
-        console.log("HI");
         const user = (await supabase.auth.getUser()).data.user;
 
         if(!user) return;
-     console.log("HI2");
-
+        console.log("HI2");
+            const formattedDate = date.toLocaleDateString('en-CA', {
+        timeZone: 'Asia/Kuala_Lumpur'
+        })
             console.log("HI3");
+            if(taskID && method === "Edit"){
             const {data, error} = await supabase
-            .from('tasks')
-            .insert({
-                user_id : user?.id,
-                title : title,
-                date: date,
-                recurring: days,
-                priority: priority,
+                .from('tasks')
+                .update({
+                    user_id : user?.id,
+                    title : title,
+                    date: formattedDate,
+                    recurring: days,
+                    priority: priority,
+                })
+                .eq('id', taskID)
+            
+            if(!error){
+                navigation.navigate('Tasks');
+            }
+
+            }else if (taskID && method === "Add Subtask") {
+            const {data, error} = await supabase
+                .from('tasks')
+                .insert({
+                    user_id : user?.id,
+                    title : title,
+                    date: formattedDate,
+                    recurring: days,
+                    priority: priority,
+                    parent_key: taskID,
+                    level: level + 1, 
+                  
             })
 
             if(!error){
                 navigation.navigate('Tasks');
             }
+        }
+            else{
+            const {data, error} = await supabase
+            .from('tasks')
+            .insert({
+                user_id : user?.id,
+                title : title,
+                date: formattedDate,
+                recurring: days,
+                priority: priority,
+                parent_key:null,
+                level: 0,
+            })
+
+            if(!error){
+                navigation.navigate('Tasks');
+            }}
 
 
         

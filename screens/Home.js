@@ -6,7 +6,7 @@ import Header from '../components/Header.js';
 import Navigation from '../components/Nav.js';
 import styles from '../assets/style.js';
 
-export default function Home(){
+export default function Home({navigation}){
     const [username, setUsername] = useState();
 
     useEffect(()=>{
@@ -58,6 +58,9 @@ export default function Home(){
                     
                 </ScrollView>
             </View>
+        <Pressable onPress={()=> navigation.navigate('AddTask')} style={styles.addTaskButton}>
+            <Image source={require('../assets/PlusWhite.png')}></Image>
+        </Pressable>
         </View>
         <Navigation></Navigation>
         </ImageBackground>

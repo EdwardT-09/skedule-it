@@ -138,6 +138,17 @@ const styles= StyleSheet.create({
         textTransform: 'uppercase',
     },
 
+    addTaskButton:{
+        position:"absolute",
+        bottom:180,
+        right:20,
+        borderRadius:50,
+        backgroundColor: '#c14343',
+        padding:20,
+        elevation:5,
+        zIndex:2,
+    },
+
     //navigation
 
     navContainer:{
@@ -253,6 +264,7 @@ const styles= StyleSheet.create({
         fontFamily: 'SpaceGrotesk_700Bold',
         fontSize:28,
         paddingLeft:10,
+        paddingTop:20,
     },
 
     taskMenuImage:{
