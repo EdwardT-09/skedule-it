@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font';
 import { JetBrainsMono_400Regular, JetBrainsMono_700Bold } from '@expo-google-fonts/jetbrains-mono';
 import {SpaceGrotesk_400Regular,SpaceGrotesk_700Bold,} from '@expo-google-fonts/space-grotesk';
+import { Sintony_400Regular, Sintony_700Bold } from '@expo-google-fonts/sintony';
+import { Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 
 import Landing from './screens/Landing.js';
 import SignIn from './screens/SignIn.js';
@@ -24,6 +26,10 @@ export default function App(){
     JetBrainsMono_700Bold,
     SpaceGrotesk_400Regular,
     SpaceGrotesk_700Bold,
+    Sintony_400Regular,
+    Sintony_700Bold,
+    Poppins_400Regular, 
+    Poppins_700Bold,
 
   });
   if (!fontsLoaded) {

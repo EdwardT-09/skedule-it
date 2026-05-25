@@ -1,7 +1,7 @@
 import { supabase } from '../config/initSupabase';
 
 
-export const onRegister = async(username, email, password) => {
+export const onRegister = async(username, email, gender, password) => {
     const {data, error} = await supabase.auth.signUp({ email:email, password:password});
     console.log("SIGNUP ERROR 1:", error);
     console.log("SIGNUP DATA 1:", data);
@@ -10,6 +10,7 @@ export const onRegister = async(username, email, password) => {
     const { error: profileError } = await supabase.from('profiles').insert({
         id:userId,
         username:username,
+        gender: gender,
     });
 
     console.log("SIGNUP ERROR 2:", profileError);

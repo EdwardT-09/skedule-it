@@ -15,7 +15,7 @@ const formattedDate = `${day}, ${date}/${month}/${year}`;
 export default function Header(){
     return(
         <View style={[styles.container, {marginTop:"13%"}]}>
-            <Image source = {require('../assets/logo.png')} style= {styles.logo}></Image>
+            <Image source = {require('../assets/logo2.png')} style= {styles.logo}></Image>
             <Text style={styles.date}>{formattedDate}</Text>
         </View>
     )
@@ -29,23 +29,22 @@ const styles= StyleSheet.create({
         alignItems: "center",
     },
     logo:{
-        width:150,
-        height:150,
+        width:145,
+        height:145,
         resizeMode:'contain',
     },
 
     date:{
-        fontFamily: 'JetBrainsMono_700Bold',
+        fontFamily: 'Poppins_400Regular',
         position:'absolute',
-        top:75,
-        right:90,
+        top:70,
+        right:135,
         zIndex:2,
-        backgroundColor: "#F5FFFE",
-        borderColor: "black",
-        borderWidth: 1,
-        padding: "2%",
-        transform: [{ rotate: '-12.62deg' }],
-        fontSize:9,
+        borderColor:'black',
+        borderBottomWidth:1,
+        backgroundColor: "transparent",
+        paddingTop: "2.5%",
+        fontSize:11,
        
     }
 })

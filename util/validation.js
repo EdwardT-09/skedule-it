@@ -21,6 +21,16 @@ export const validateEmail = (email) => {
     return null;
 };
 
+export const validateGender = (gender) => {
+    if (isEmpty(gender)){
+        return "The gender field is empty.";
+    } 
+
+    return null;
+};
+
+
+
 export const validatePassword = (password) => {
     const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[%&?_#=-])[A-Za-z\d%&?_#=-]{8,}$/;
     if (isEmpty(password)){

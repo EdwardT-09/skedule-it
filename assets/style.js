@@ -4,8 +4,14 @@ import { StyleSheet } from "react-native";
 const styles= StyleSheet.create({
 
     links:{
-        color:'#4ECDC4',
-        textDecorationLine: 'underline',
+        color:'black',
+        fontFamily: 'Poppins_700Bold',
+    },
+
+    visiblePassword:{
+        fontFamily: 'Poppins_700Bold',
+        fontSize:13,
+
     },
 
     borderButton:{
@@ -17,7 +23,7 @@ const styles= StyleSheet.create({
     errorText:{
         color:'red',
         fontSize: 12,
-        fontFamily: 'SpaceGrotesk_400Regular',
+        fontFamily: 'Poppins_400Regular',
     },
 
     center:{
@@ -34,16 +40,16 @@ const styles= StyleSheet.create({
 
 
     container:{
-        width: '90%',
-        backgroundColor: '#fff',
+        width: '100%',
+        backgroundColor: 'transparent',
         borderRadius: 15,
         // borderColor:'black',
         // borderWidth: 1,
-        elevation:10,
-        shadowColor: '#000', 
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
+        // elevation:10,
+        // shadowColor: '#000', 
+        // shadowOffset: { width: 0, height: 2 },
+        // shadowOpacity: 0.25,
+        // shadowRadius: 3.84,
     },
 
     titleContainer:{
@@ -53,24 +59,37 @@ const styles= StyleSheet.create({
         paddingVertical: '5%',
         borderBottomColor:'black',
         borderBottomWidth: 1,
+
     },
 
     subtitle:{
         textAlign:'left',
-        fontFamily: 'JetBrainsMono_400Regular',
+        fontFamily:  'Poppins_400Regular',
         fontSize:12,
+    },
+
+    landingTitle:{
+        color:'black',
+        fontSize:40,
+        fontFamily: 'Sintony_700Bold'
+    },
+
+    landingDesc:{
+        color:'black',
+        fontSize:16,
+        fontFamily:  'Poppins_400Regular',
     },
 
     title:{
         color:'black',
         fontSize:28,
-        fontFamily: 'SpaceGrotesk_700Bold'
+        fontFamily: 'Sintony_700Bold'
     },
 
     desc:{
         color:'black',
         fontSize:11,
-        fontFamily: 'SpaceGrotesk_400Regular'
+        fontFamily:  'Poppins_400Regular',
     },
 
     buttons:{
@@ -79,20 +98,21 @@ const styles= StyleSheet.create({
         borderColor: 'black',
         borderWidth:1,
         marginTop:'10%',
+        borderRadius:50,
 
         //ios shadow
-        shadowColor: "black",
-        shadowOffset: {wdith:10, height: 10},
-        shadowOpacity:0.5,
-        shadowRadius: 5,
-        backgroundColor: 'white',
+        // shadowColor: "black",
+        // shadowOffset: {wdith:10, height: 10},
+        // shadowOpacity:0.5,
+        // shadowRadius: 5,
+        // backgroundColor: 'white',
 
-        //android shadow
-        elevation:4,
+        // //android shadow
+        // elevation:4,
     },
 
     buttonTexts:{
-        fontFamily: 'JetBrainsMono_700Bold',
+        fontFamily: 'Poppins_700Bold',
         fontSize:15,
         textAlign:'center',
     },
@@ -100,15 +120,15 @@ const styles= StyleSheet.create({
     input:{
         height: 40,
         width: '100%',
-        backgroundColor:'#F0F0F0',
+        backgroundColor:'transparent',
         borderColor: "black",
-        borderWidth: 1,
-        fontFamily:'JetBrainsMono_400Regular',
+        borderBottomWidth: 1,
+        fontFamily:'Poppins_400Regular',
         fontSize:11,
     },
     
     fieldLabels:{
-        fontFamily:'JetBrainsMono_400Regular',
+        fontFamily:'Poppins_400Regular',
         fontSize:13,
         marginBottom:'3%',
     },
@@ -126,16 +146,15 @@ const styles= StyleSheet.create({
     },
 
     authFooterText:{
-        fontFamily: 'JetBrainsMono_400Regular',
+        fontFamily: 'Poppins_400Regular',
         fontSize: 10,
     },
 
     welcomeText:{
-        fontFamily: 'JetBrainsMono_700Bold',
+        fontFamily: 'Sintony_400Regular',
         fontSize:24,
         textAlign: 'center',
-        textDecorationLine:'underline',
-        textTransform: 'uppercase',
+        textTransform: 'lowercase',
     },
 
     addTaskButton:{
@@ -176,7 +195,7 @@ const styles= StyleSheet.create({
     },
 
     navLabel:{
-        fontFamily: 'JetBrainsMono_400Regular',
+        fontFamily: 'Poppins_400Regular',
         fontSize:11,
     },
 
@@ -190,14 +209,28 @@ const styles= StyleSheet.create({
 
 
     //profile
+    profileName:{
+        fontFamily:'Sintony_700Bold',
+        fontSize:30,
+        textAlign:'center',
+        marginTop:'2%',
+    },
+
+    profileGender:{
+        fontFamily:'Poppins_400Regular',
+        fontSize:14,
+        textAlign:'center',
+        textTransform:'lowercase',
+    },
+
     profileText:{
-        fontFamily:'SpaceGrotesk_700Bold',
+        fontFamily:'Sintony_700Bold',
         fontSize:28,
         textAlign:'center',
     },
 
     settingsText:{
-        fontFamily: 'JetBrainsMono_400Regular',
+        fontFamily: 'Poppins_400Regular',
         fontSize:14,
         paddingLeft:'3%',
     },
@@ -261,7 +294,7 @@ const styles= StyleSheet.create({
     },
 
     timeLabel:{
-        fontFamily: 'SpaceGrotesk_700Bold',
+        fontFamily: 'Sintony_700Bold',
         fontSize:28,
         paddingLeft:10,
         paddingTop:20,
@@ -274,7 +307,7 @@ const styles= StyleSheet.create({
 
     taskMenuLabels:{
         fontSize:16,
-        fontFamily: 'JetBrainsMono_400Regular',
+        fontFamily: 'Poppins_400Regular',
     },
 
 

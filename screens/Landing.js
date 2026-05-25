@@ -1,27 +1,30 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, ImageBackground, Image } from 'react-native';
-import Header from '../components/Header.js';
+import {LinearGradient} from 'expo-linear-gradient';
 
 import styles from '../assets/style.js';
 
 
 export default function Landing({ navigation }) {
   return (
-        <ImageBackground source={require('../assets/bg4.jpg')} imageStyle={{opacity:0.4}} style={{flex:1}}>
-        <View style={styles.center}>
-            <Header></Header>
-            <View style={styles.container}>
-                <View style={[styles.titleContainer, { backgroundColor:'#4ECDC4'}, {paddingLeft:'7%'}]}>
-                    <Text style={styles.title}>let's start</Text>
-                    <Text style={styles.desc}>start your study journey with us</Text>
+        <View style={{flex:1,}}>
+            <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172', ]} style={{flex:1,}}>
+            <View style={styles.center}>
+                <Image source={require('../assets/logo2.png')} style={{width:400, height:100, marginTop:'35%', resizeMode: 'contain',}}></Image>
+                <View style={{flex:1, justifyContent:'center', alignSelf:'center'}}>
+                    <View style={[styles.titleContainer, {paddingLeft:'7%', marginTop:'30%'}]}>
+                        <Text style={styles.landingTitle}>let's start</Text>
+                        <Text style={styles.landingDesc}>start your study journey with us</Text>
+                    </View>
+                    <View style={[{paddingVertical:"10%"}]}>
+                        <Pressable onPress = {() => navigation.navigate('Register')} style={({pressed}) => [styles.buttons, {backgroundColor: pressed ? '#ddd': 'black',}]}><Text style={[styles.buttonTexts, {color:'white'}]}>REGISTER</Text></Pressable>
+                        <Pressable onPress = {() => navigation.navigate('SignIn')} style={({pressed}) => [styles.buttons, {backgroundColor: pressed ? '#ddd': 'transparent' }]}><Text style={styles.buttonTexts}>SIGN IN</Text></Pressable>
                 </View>
-                <View style={[{paddingVertical:"10%"}, {marginHorizontal:'10%'}]}>
-                    <Pressable onPress = {() => navigation.navigate('Register')} style={({pressed}) => [styles.buttons, { transform: [{ rotate: '3deg' }]}, {backgroundColor: pressed ? '#ddd': 'white' }]}><Text style={styles.buttonTexts}>REGISTER</Text></Pressable>
-                    <Pressable onPress = {() => navigation.navigate('SignIn')} style={({pressed}) => [styles.buttons, { transform: [{ rotate: '-3deg' }]}, {backgroundColor: pressed ? '#ddd': 'white' }]}><Text style={styles.buttonTexts}>SIGN IN</Text></Pressable>
                 </View>
+
             </View>
+            </LinearGradient>
         </View>
-    </ImageBackground>
   );
 }
 
