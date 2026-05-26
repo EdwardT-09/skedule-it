@@ -36,9 +36,9 @@ export default function Languages({navigation}){
                             </Text>
                         </View>
                     </View>
-                        <Pressable onPress={() => {setIsLanguage('en'); saveLanguage('en');}} style={({pressed}) => [styles.settingItem, {backgroundColor: pressed? "#e9e9e9" : 'transparent'}, { borderColor:'black', borderBottomWidth:1}]}><Text style={styles.settingsText}>english</Text></Pressable>
-                        <Pressable onPress={() => {setIsLanguage('bm'); saveLanguage('bm');}} style={({pressed}) => [styles.settingItem, {backgroundColor: pressed? "#e9e9e9" : 'transparent'}, { borderColor:'black', borderBottomWidth:1}]}><Text style={styles.settingsText}>bahasa melayu</Text></Pressable>
-                        <Pressable onPress={() => {setIsLanguage('zh'); saveLanguage('zh');}} style={({pressed}) => [styles.settingItem, {backgroundColor: pressed? "#e9e9e9" : 'transparent'}, { borderColor:'black', borderBottomWidth:1}]}><Text style={styles.settingsText}>中文（简体）</Text></Pressable>
+                        <Pressable onPress={() => {setIsLanguage('en'); saveLanguage('en');}} style={({pressed}) => [styles.settingItem, {opacity: pressed ? 0.5 : 1}, { borderColor:'black', borderBottomWidth:1}]}><Text style={styles.settingsText}>english</Text></Pressable>
+                        <Pressable onPress={() => {setIsLanguage('bm'); saveLanguage('bm');}} style={({pressed}) => [styles.settingItem, {opacity: pressed ? 0.5 : 1}, { borderColor:'black', borderBottomWidth:1}]}><Text style={styles.settingsText}>bahasa melayu</Text></Pressable>
+                        <Pressable onPress={() => {setIsLanguage('zh'); saveLanguage('zh');}} style={({pressed}) => [styles.settingItem, {opacity: pressed ? 0.5 : 1}, { borderColor:'black', borderBottomWidth:1}]}><Text style={styles.settingsText}>中文（简体）</Text></Pressable>
 
                 </View>
             </View>

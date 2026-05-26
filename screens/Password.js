@@ -84,7 +84,7 @@ export default function Password({navigation}){
                                     <TextInput style={styles.input} secureTextEntry={true} value={confirmPassword} onChangeText={setConfirmPassword} placeholder='enter your new password again'></TextInput>
                                     {confirmPasswordError? (<Text style={styles.errorText}>{confirmPasswordError}</Text>) : null}
                                 </View>
-                                <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {backgroundColor: pressed? "#ffffff" : 'transparent'}, ]} onPress={changePassword}>
+                                <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {opacity: pressed ? 0.5 : 1}, ]} onPress={changePassword}>
                                     <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
                                         <Text style={styles.buttonTexts} >LET'S GO </Text>
                                     </View>

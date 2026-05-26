@@ -17,8 +17,8 @@ export default function Landing({ navigation }) {
                         <Text style={styles.landingDesc}>start your study journey with us</Text>
                     </View>
                     <View style={[{paddingVertical:"10%"}]}>
-                        <Pressable onPress = {() => navigation.navigate('Register')} style={({pressed}) => [styles.buttons, {backgroundColor: pressed ? '#ddd': 'black',}]}><Text style={[styles.buttonTexts, {color:'white'}]}>REGISTER</Text></Pressable>
-                        <Pressable onPress = {() => navigation.navigate('SignIn')} style={({pressed}) => [styles.buttons, {backgroundColor: pressed ? '#ddd': 'transparent' }]}><Text style={styles.buttonTexts}>SIGN IN</Text></Pressable>
+                        <Pressable onPress = {() => navigation.navigate('Register')} style={({pressed}) => [styles.buttons, {backgroundColor:'black', opacity: pressed ? 0.5 : 1,}]}><Text style={[styles.buttonTexts, {color:'white'}]}>REGISTER</Text></Pressable>
+                        <Pressable onPress = {() => navigation.navigate('SignIn')} style={({pressed}) => [styles.buttons, {backgroundColor: 'transparent', opacity: pressed ? 0.5 : 1, }]}><Text style={styles.buttonTexts}>SIGN IN</Text></Pressable>
                 </View>
                 </View>
 
