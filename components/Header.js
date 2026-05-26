@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, Image, Pressable} from 'react-native';
 
 const today = new Date();
 
@@ -12,16 +12,25 @@ const year = today.getFullYear();
 
 const formattedDate = `${day}, ${date}/${month}/${year}`;
 
-export default function Header(){
+export default function Header({includeBack = false ,navigation}){
     return(
-        <View style={[styles.container, {marginTop:"13%"}]}>
-            <Image source = {require('../assets/logo2.png')} style= {styles.logo}></Image>
-            <Text style={styles.date}>{formattedDate}</Text>
+        <View style={{flex:0, flexDirection:'row', marginTop:'13%'}}>
+            {includeBack && (<Pressable onPress={()=> navigation.goBack()} style={styles.back}><Image source={require('../assets/ChevronLeft.png')} style={{width:35, height:35}}></Image></Pressable>)}
+            <View style={[styles.container, ]}>
+                <Image source = {require('../assets/logo2.png')} style= {styles.logo}></Image>
+                <Text style={styles.date}>{formattedDate}</Text>
+            </View>
         </View>
     )
 }
 
 const styles= StyleSheet.create({
+    back:{
+        position:'absolute',
+        top:60,
+        left:20,
+    },
+
     container:{
         width:"100%",
         display: "flex",

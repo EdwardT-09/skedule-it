@@ -84,8 +84,6 @@ export default function SignIn({navigation}) {
                                     <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {backgroundColor: pressed? "gray" : 'black'}]} onPress={handleSignIn}>
                                         <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
                                             <Text style={[styles.buttonTexts, {color:'white'}]} >LET'S GO </Text>
-                                            <Image source={require('../assets/Check.png')}>
-                                            </Image>
                                         </View>
                                     </Pressable>
                                        <View style={[{flexDirection:'column', paddingVertical:'10%', justifyContent:'space-between'}]}>

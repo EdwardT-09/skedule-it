@@ -7,7 +7,7 @@ import Header from '../components/Header.js';
 import Navigation from '../components/Nav.js';
 import styles from '../assets/style.js';
 
-export default function Languages(){
+export default function Languages({navigation}){
     const [isLanguage, setIsLanguage] = useState('en');
     const saveLanguage  = async(lang) => {
         const user = (await supabase.auth.getUser()).data.user;
@@ -25,7 +25,7 @@ export default function Languages(){
     return(
     <View style={{flex:1}}>
         <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
-            <Header/>
+            <Header includeBack navigation={navigation}/>
             <View style={{flex:0, justifyContent:'center', alignItems:'center',}}>
                 <View style={[styles.container, {marginTop:'10%'}]}>
                     <View style={[styles.titleContainer, ]}>

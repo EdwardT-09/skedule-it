@@ -196,7 +196,7 @@ export default function AddTask ({navigation, route}){
     return(
         <View style={{flex:1,}}>
             <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
-                <Header></Header>
+                <Header includeBack navigation={navigation}></Header>
                 <View style={{flex:0, alignItems:'center'}}>
                 <View style={[styles.container, ]}>
                     <View style={[styles.titleContainer]}>

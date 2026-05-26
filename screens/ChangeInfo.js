@@ -65,7 +65,7 @@ export default function ChangeInfo({navigation}){
     return(
          <View style={{flex:1,}}>
             <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
-                <Header></Header>
+                <Header includeBack navigation={navigation}></Header>
                 <View style={styles.container}>
                     <View style={[styles.titleContainer, {padding:'5%'}]}>
                         <Text style={styles.desc}>personal details</Text>

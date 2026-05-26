@@ -115,8 +115,6 @@ export default function Register({navigation}) {
                                         <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {backgroundColor: pressed? 'gray' : 'black'}]} onPress={handleRegister}>
                                             <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
                                                 <Text style={[styles.buttonTexts, {color:'white'}]} >LET'S GO </Text>
-                                                <Image source={require('../assets/Check.png')}>
-                                                </Image>
                                             </View>
                                         </Pressable>
                                         <View style={[{flexDirection:'row'}, {alignItems:'center', marginTop:'5%'}]}>
