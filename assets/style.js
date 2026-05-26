@@ -205,6 +205,7 @@ const styles= StyleSheet.create({
         // borderColor: 'black',
         // borderWidth:1,
         padding:10,
+        shadowColor: '#ffcd07',
     },
 
 
@@ -267,9 +268,22 @@ const styles= StyleSheet.create({
     //tasks
     taskItem:{
         borderColor:'black',
-        borderBottomWidth:1,
+        borderWidth:1,
+        margin:'2.5%',
         padding:'3%',
+        borderRadius: 10
     },
+
+    taskTitle:{
+        fontFamily:'Poppins_700Bold',
+        fontSize:15,
+    },
+
+    taskInfo:{
+        fontFamily:'Poppins_400Regular',
+        fontSize:11,
+    },
+
 
     taskMenuContainer:{
         backgroundColor:'rgb(255, 255, 255)',

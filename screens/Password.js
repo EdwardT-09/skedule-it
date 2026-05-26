@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView} from "react-native";
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import {supabase} from '../config/initSupabase.js';
 import {validatePassword, validatePassword2 } from '../util/validation.js';
@@ -53,49 +54,47 @@ export default function Password(){
         
     }
     return(
-    <ImageBackground source={require('../assets/bg4.jpg')} imageStyle={{opacity:0.4}} style={{flex:1}}>
-        <ScrollView>
-            <Header/>
-            <View style={{flex:0, justifyContent:'center', alignItems:'center'}}>
-                <View style={[styles.container, {marginTop:'10%', marginBottom:'8%'}]}>
-                    <View style={[styles.titleContainer,{backgroundColor:'#c14343'}]}>
-                        <View style={{paddingLeft: '5%'}}>
-                            <Text style={styles.subtitle}>settings</Text>
-                            <Text style={styles.title}>
-                                change password
-                            </Text>
+    <View style={{flex:1}}>
+        <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
+            <ScrollView>
+                <Header/>
+                <View style={{flex:0, justifyContent:'center', alignItems:'center'}}>
+                    <View style={[styles.container, {marginTop:'10%', marginBottom:'8%'}]}>
+                        <View style={[styles.titleContainer]}>
+                            <View style={{paddingLeft: '5%'}}>
+                                <Text style={styles.subtitle}>settings</Text>
+                                <Text style={styles.title}>
+                                    change password
+                                </Text>
+                            </View>
                         </View>
-                    </View>
-                        <SafeAreaView style={{paddingHorizontal: 15}}>
-                            <View style={styles.fields}>
-                                <Text style={styles.fieldLabels}>Current Password: </Text>
-                                <TextInput style={styles.input} secureTextEntry={true} value={currentPassword} onChangeText={setCurrentPassword}></TextInput>
-                                {currentPasswordError? (<Text style={styles.errorText}>{currentPasswordError}</Text>) : null}
-                            </View>
-                            <View style={styles.fields}>
-                                <Text style={styles.fieldLabels}>New Password: </Text>
-                                <TextInput style={styles.input} secureTextEntry={true} value={newPassword} onChangeText={setNewPassword}></TextInput>
-                                {newPasswordError? (<Text style={styles.errorText}>{newPasswordError}</Text>) : null}
-                            </View>
-                            <View style={styles.fields}>
-                                <Text style={styles.fieldLabels}>Confirm New Password: </Text>
-                                <TextInput style={styles.input} secureTextEntry={true} value={confirmPassword} onChangeText={setConfirmPassword}></TextInput>
-                                {confirmPasswordError? (<Text style={styles.errorText}>{confirmPasswordError}</Text>) : null}
-                            </View>
-                            <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {backgroundColor: pressed? "#e4b639" : '#FFE66D'}, {transform: [{rotate: '3deg'}]}]} onPress={changePassword}>
-                                <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
-                                    <Text style={styles.buttonTexts} >LET'S GO </Text>
-                                    <Image source={require('../assets/Check.png')}>
-                                    </Image>
+                            <SafeAreaView style={{paddingHorizontal: 15}}>
+                                <View style={styles.fields}>
+                                    <Text style={styles.fieldLabels}>Current Password: </Text>
+                                    <TextInput style={styles.input} secureTextEntry={true} value={currentPassword} onChangeText={setCurrentPassword} placeholder='enter your current password'></TextInput>
+                                    {currentPasswordError? (<Text style={styles.errorText}>{currentPasswordError}</Text>) : null}
                                 </View>
-                            </Pressable>
-                        </SafeAreaView>
+                                <View style={styles.fields}>
+                                    <Text style={styles.fieldLabels}>New Password: </Text>
+                                    <TextInput style={styles.input} secureTextEntry={true} value={newPassword} onChangeText={setNewPassword} placeholder='enter your new password'></TextInput>
+                                    {newPasswordError? (<Text style={styles.errorText}>{newPasswordError}</Text>) : null}
+                                </View>
+                                <View style={styles.fields}>
+                                    <Text style={styles.fieldLabels}>Confirm New Password: </Text>
+                                    <TextInput style={styles.input} secureTextEntry={true} value={confirmPassword} onChangeText={setConfirmPassword} placeholder='enter your new password again'></TextInput>
+                                    {confirmPasswordError? (<Text style={styles.errorText}>{confirmPasswordError}</Text>) : null}
+                                </View>
+                                <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {backgroundColor: pressed? "#ffffff" : 'transparent'}, ]} onPress={changePassword}>
+                                    <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
+                                        <Text style={styles.buttonTexts} >LET'S GO </Text>
+                                    </View>
+                                </Pressable>
+                            </SafeAreaView>
 
+                    </View>
                 </View>
-            </View>
-        </ScrollView>
-
-        
-    </ImageBackground>
+            </ScrollView>
+        </LinearGradient>
+    </View>
     )
 }
