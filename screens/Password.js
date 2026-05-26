@@ -90,7 +90,6 @@ export default function Password(){
                                     </View>
                                 </Pressable>
                             </SafeAreaView>
-
                     </View>
                 </View>
             </ScrollView>

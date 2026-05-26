@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import { View, Text, Modal, Pressable, StyleSheet, ImageBackground, Image, ScrollView, TextInput, Button} from 'react-native';
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {Picker} from '@react-native-picker/picker';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import {supabase} from '../config/initSupabase.js';
@@ -199,7 +198,7 @@ export default function AddTask ({navigation, route}){
             <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
                 <Header></Header>
                 <View style={{flex:0, alignItems:'center'}}>
-                <View style={[styles.container]}>
+                <View style={[styles.container, ]}>
                     <View style={[styles.titleContainer]}>
                         <View style={{paddingHorizontal: '5%'}}>
                             <Text style={styles.subtitle}>let's go</Text>

@@ -76,7 +76,12 @@ export default function Profile({navigation}){
                         <Header></Header>
                         <Text style={styles.profileText}>my profiles</Text> 
                         <Image source={genderImage[gender]} style={{width:200, height:200, resizeMode:'contain', marginTop:'5%',}}></Image>
-                        <Text style={styles.profileName}>{username}</Text>
+                        <View style={{flex:0, flexDirection:'row', alignItems:'center'}}>
+                            <Text style={styles.profileName}>{username}</Text>
+                            <Pressable onPress={()=> navigation.navigate('ChangeInfo')} style={({pressed}) => [{opacity: pressed? 0.5 : 1, paddingLeft:'5%'}]}>
+                                <Image source={require('../assets/Edit.png')} style={{width:25, height:25,}}></Image>
+                            </Pressable>
+                        </View>
                         <Text style={styles.profileGender}>{gender}</Text>
                         <View style={[styles.container, {marginTop:'10%'}]}>
                             <View style={[styles.titleContainer]}>
@@ -87,40 +92,39 @@ export default function Profile({navigation}){
                                     </Text>
                                 </View>
                             </View>
-                                <Pressable onPress={ () => {navigation.navigate('Languages')}} style={({pressed}) => [styles.settingItem, {backgroundColor: 'transparent', opacity: pressed? 0.5 : 1},{borderColor:'black', borderBottomWidth:1,flexDirection:'row', alignItems:'center', justifyContent:'space-between'}]}>
-                                    <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
-                                        <Image source={require('../assets/Globe.png')}></Image>
-                                        <Text style={styles.settingsText}>languages</Text>
-                                    </View>
-                                    <View>
-                                        <Image source={require('../assets/Caret Right.png')}></Image>
-                                        </View>
-                                </Pressable>
-                                <View style={[styles.settingItem,{borderColor:'black', borderBottomWidth:1,flexDirection:'row', alignItems:'center', justifyContent:'space-between'}]}>
-                                    <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
-                                        <Image source={require('../assets/Bell.png')}></Image>
-                                        <Text style={styles.settingsText}>notification</Text>
-                                    </View>
-                                    <View>
-                                        <Switch trackColor={{false: 'gray', true: 'gray'}} thumbColor={isEnabled? 'black' : 'white'} onValueChange={saveNotification} value={isEnabled}></Switch>
-                                    </View>
+                            <Pressable onPress={ () => {navigation.navigate('Languages')}} style={({pressed}) => [styles.settingItem, {backgroundColor: 'transparent', opacity: pressed? 0.5 : 1},{borderColor:'black', borderBottomWidth:1,flexDirection:'row', alignItems:'center', justifyContent:'space-between'}]}>
+                                <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
+                                    <Image source={require('../assets/Globe.png')}></Image>
+                                    <Text style={styles.settingsText}>languages</Text>
                                 </View>
-                                <Pressable onPress={()=>{navigation.navigate('Password')}} style={({pressed}) => [styles.settingItem, {backgroundColor: 'transparent', opacity: pressed? 0.5 : 1},{borderColor:'black', borderBottomWidth:1,flexDirection:'row', alignItems:'center', justifyContent:'space-between'}]}>
-                                    <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
-                                        <Image source={require('../assets/Key.png')}></Image>
-                                        <Text style={styles.settingsText}>change password</Text>
+                                <View>
+                                    <Image source={require('../assets/Caret Right.png')}></Image>
                                     </View>
-                                    <View>
-                                        <Image source={require('../assets/Caret Right.png')}></Image>
-                                    </View>
-                                </Pressable>
-                                <View style={{paddingLeft:'3%', paddingVertical:'4%', flex:0, justifyContent:'center', alignItems:'center'}}>
-                                    <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
-                                        <Image source={require('../assets/Log out.png')}></Image>
-                                        <Text style={[styles.settingsText,{color:'#c14343'}]}>logout</Text>
-                                    </View>
+                            </Pressable>
+                            <View style={[styles.settingItem,{borderColor:'black', borderBottomWidth:1,flexDirection:'row', alignItems:'center', justifyContent:'space-between'}]}>
+                                <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
+                                    <Image source={require('../assets/Bell.png')}></Image>
+                                    <Text style={styles.settingsText}>notification</Text>
                                 </View>
-
+                                <View>
+                                    <Switch trackColor={{false: 'gray', true: 'gray'}} thumbColor={isEnabled? 'black' : 'white'} onValueChange={saveNotification} value={isEnabled}></Switch>
+                                </View>
+                            </View>
+                            <Pressable onPress={()=>{navigation.navigate('Password')}} style={({pressed}) => [styles.settingItem, {backgroundColor: 'transparent', opacity: pressed? 0.5 : 1},{borderColor:'black', borderBottomWidth:1,flexDirection:'row', alignItems:'center', justifyContent:'space-between'}]}>
+                                <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
+                                    <Image source={require('../assets/Key.png')}></Image>
+                                    <Text style={styles.settingsText}>change password</Text>
+                                </View>
+                                <View>
+                                    <Image source={require('../assets/Caret Right.png')}></Image>
+                                </View>
+                            </Pressable>
+                            <View style={{paddingLeft:'3%', paddingVertical:'4%', flex:0, justifyContent:'center', alignItems:'center'}}>
+                                <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
+                                    <Image source={require('../assets/Log out.png')}></Image>
+                                    <Text style={[styles.settingsText,{color:'#c14343'}]}>logout</Text>
+                                </View>
+                            </View>
                         </View>
                     </View>
                 </ScrollView>

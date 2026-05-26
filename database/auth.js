@@ -7,7 +7,8 @@ export const onRegister = async(username, email, gender, password) => {
     console.log("SIGNUP DATA 1:", data);
     const userId = data?.user?.id;
    
-    const { error: profileError } = await supabase.from('profiles').insert({
+    const { error: profileError } = await supabase
+    .from('profiles').insert({
         id:userId,
         username:username,
         gender: gender,

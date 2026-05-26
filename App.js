@@ -16,6 +16,7 @@ import AddTask from './screens/AddTask.js';
 import Profile from './screens/Profile.js';
 import Languages from './screens/Languages.js';
 import Password from './screens/Password.js';
+import ChangeInfo from './screens/ChangeInfo.js';
 
 
 const Stack = createNativeStackNavigator();
@@ -47,6 +48,7 @@ export default function App(){
         <Stack.Screen name="Profile" component={Profile}></Stack.Screen>
         <Stack.Screen name="Languages" component={Languages}></Stack.Screen>
         <Stack.Screen name="Password" component={Password}></Stack.Screen>
+        <Stack.Screen name="ChangeInfo" component={ChangeInfo}></Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
 );
