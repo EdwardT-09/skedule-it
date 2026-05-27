@@ -3,175 +3,24 @@ import { View, Text, Pressable, StyleSheet, ImageBackground, Image, ScrollView} 
 import { LinearGradient } from 'expo-linear-gradient';
 import Modal from 'react-native-modal'
 import {supabase} from '../config/initSupabase.js';
+import { priorityColors } from '../util/taskHelpers.js';
 import Header from '../components/Header.js';
 import Nav from '../components/Nav.js';
 import styles from '../assets/style.js';
+import useTask from '../hook/useTask.js'
 
 export default function Tasks ({navigation}){
-    const [todayTasks, setTodayTasks] = useState([]);
-    const [upcomingTasks, setUpcomingTasks] = useState([]);
     const [selectedTask, setSelectedTask] = useState();
-    const [menuVisible, setMenuVisible] = useState(false);
 
-    //assign a ranking system to determine the priority order
-    const priorities = ['Q1', 'Q2', 'Q3', 'Q4'];
-    //using key value map to assign colors to each priority level
-    const priorityColors = {Q1: '#c14343', Q2 : '#e3922f', Q3 : '#efd868', Q4:'#46b6af'};
-
-    const currentDate = new Date();
-    const pad = (n) => String(n).padStart(2, '0');
-
-    const currentDateStr = `${currentDate.getFullYear()}-${pad(currentDate.getMonth()+1)}-${pad(currentDate.getDate())}`;
-    const weekDay = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const todayName = weekDay[currentDate.getDay()];
-
-    useEffect(()=>{getTasks()}, [])
-
-    const deleteTask = async(selectedTask) =>{
-        const user = (await supabase.auth.getUser()).data.user;
-
-        if(!user) return;
-
-        const {error} = await supabase
-        .from('tasks')
-        .delete()
-        .eq('id', selectedTask)
-
-        if(error){
-            console.log(error);
-        } else{ 
-            getTasks();
-            setMenuVisible(false);
-        }
-    }
-
-    const organizeTasks = (tasks) =>{
-        //store main tasks in parent var
-        const parents = tasks.filter(task => !task.parent_key);
-
-        //sort parents by priority
-        parents.sort(
-                (a,b) =>
-                    //when it is negative, a will come first
-                    //when it is positive, b will come first
-                    //if its equal, it will keep the same order
-                    priorities.indexOf(a.priority) - priorities.indexOf(b.priority)
-        )
-
-        //add the subtasks
-        const organized = []
-
-        parents.forEach(parent => {
-            // add the parent into the organized array
-            organized.push(parent);
-
-            //get the subtask 
-            const subtasks = tasks.filter(task => task.parent_key === parent.id);
-
-            subtasks.sort(
-                (a,b) => 
-                    //when it is negative, a will come first
-                    //when it is positive, b will come first
-                    //if its equal, it will keep the same order
-                    priorities.indexOf(a.priority) - priorities.indexOf(b.priority)  
-            );
-            organized.push(...subtasks);
-            subtasks.forEach(subtask =>{
-                //get the sub-subtask 
-                const childSubtasks = tasks.filter(task => task.parent_key === subtask.id);
-                childSubtasks.sort((a,b) => 
-                    //when it is negative, a will come first
-                    //when it is positive, b will come first
-                    //if its equal, it will keep the same order
-                    priorities.indexOf(a.priority) - priorities.indexOf(b.priority)  
-                );
-            organized.push(...childSubtasks);
-            })
-          
-        })
-        return organized;
-    } 
-
-    const isTodayTask = (task) =>{
-        const oneTimeTask = task.date === currentDateStr;
-
-        const recurringTask = task.recurring?.includes(todayName) && Array.isArray(task.recurring) && task.date <= currentDateStr;
-
-        return oneTimeTask || recurringTask
-    }
-
-    const includeParents = (tasks) => {
-        const taskMap = new Map(tasks.map(t=> [t.id, t]));
-
-        //using set to avoid duplicated results
-        const set = new Set(tasks);
-
-        tasks.forEach(task => {
-            let parentId = task.parent_key;
-
-            while(parentId){
-                const parent = taskMap.get(parentId);
-                if(!parent) break;
-
-                set.add(parent);
-                parentId = parent.parent_key;
-            }
-        })
-        return Array.from(set);
-    }
-
-    const getTasks = async() => {
-        const user = (await supabase.auth.getUser()).data.user;
-
-        if(!user) return;
-
-        //get data for today
-        const {data, error} = await supabase
-            .from('tasks')
-            .select('id, title, date, recurring, priority, parent_key, level')
-            .eq('user_id', user.id)
-            //.eq('date', currentDate.getFullYear() +"-" + (currentDate.getMonth()+1) + "-" + currentDate.getDate() )
-            
-
-        if(data){
-            const todayFiltered = data.filter(isTodayTask);
-            const withParents = includeParents(todayFiltered)
-            todayFiltered.sort(
-                (a,b) =>
-                    //when it is negative, a will come first
-                    //when it is positive, b will come first
-                    //if its equal, it will keep the same order
-                    priorities.indexOf(a.priority) - priorities.indexOf(b.priority)
-            )
-            setTodayTasks(organizeTasks(todayFiltered));
-        }
-
-        if(error){
-            console.log(error);
-        }
-
-        //get data for the month
-        const {data : upcomingData, error: upcomingError} = await supabase
-            .from('tasks')
-            .select('id, title, date, recurring, priority, parent_key, level')
-            .eq('user_id', user.id)
-            .gt('date', currentDate.getFullYear() +"-" + (currentDate.getMonth()+1) + "-" + currentDate.getDate() )
-            
-        if(upcomingData){
-            upcomingData.sort(
-                (a,b) =>
-                    //when it is negative, a will come first
-                    //when it is positive, b will come first
-                    //if its equal, it will keep the same order
-                    // new Date(a.date) - new Date (b.date),
-                    priorities.indexOf(a.priority) - priorities.indexOf(b.priority)
-            )
-            setUpcomingTasks(organizeTasks(upcomingData));
-        }
-
-
-
-    }
+    const {
+        todayTasks,
+        upcomingTasks,
+        menuVisible,
+        setMenuVisible,
+        refreshTasks,
+        deleteTask,
+    } = useTask();
+    
 
     return(
         
