@@ -55,7 +55,10 @@ const styles= StyleSheet.create({
     titleContainer:{
         borderTopStartRadius:13,
         borderTopEndRadius:13,     
-        // alignItems:'center',
+        // flex:0,
+        // flexDirection:'column',
+        // justifyContent:'start',
+        // alignItems:'left',
         paddingVertical: '5%',
         borderBottomColor:'black',
         borderBottomWidth: 1,
@@ -271,7 +274,8 @@ const styles= StyleSheet.create({
         borderWidth:1,
         margin:'2.5%',
         padding:'3%',
-        borderRadius: 10
+        borderRadius: 10,
+
     },
 
     taskTitle:{

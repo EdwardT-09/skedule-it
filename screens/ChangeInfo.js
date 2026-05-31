@@ -1,7 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, use} from 'react';
 import { View, Text, Modal, Pressable, StyleSheet, ImageBackground, Image, ScrollView, TextInput, Button} from 'react-native';
 import { validateUsername, validateGender } from '../util/validation.js';
 import styles from '../assets/style.js';
+
+import useDictionary from '../hook/useDictionary.js'
 import Header from '../components/Header.js';
 import { LinearGradient } from 'expo-linear-gradient';
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
@@ -11,6 +13,9 @@ export default function ChangeInfo({navigation}){
     useEffect(()=>{
         getDetails();
     }, [])
+
+    const dictionary = useDictionary();
+
     const [username, setUsername] = useState('');
     const [gender, setGender] = useState('');
 
@@ -40,8 +45,8 @@ export default function ChangeInfo({navigation}){
         const user = (await supabase.auth.getUser()).data.user;
     
         if(!user) return;
-        const usernameErr = validateUsername(username);
-        const genderErr = validateGender(gender);
+        const usernameErr = validateUsername(username, dictionary);
+        const genderErr = validateGender(gender, dictionary);
 
         setUsernameError(usernameErr);
         setGenderError(genderErr);
@@ -68,27 +73,27 @@ export default function ChangeInfo({navigation}){
                 <Header includeBack navigation={navigation}></Header>
                 <View style={styles.container}>
                     <View style={[styles.titleContainer, {padding:'5%'}]}>
-                        <Text style={styles.desc}>personal details</Text>
-                        <Text style={styles.title}>change information </Text>
+                        <Text style={styles.desc}>{dictionary.personal_details}</Text>
+                        <Text style={styles.title}>{dictionary.update} {dictionary.information}</Text>
                     </View>
                     <SafeAreaView style={{paddingHorizontal:15}}>
                         <View style={styles.fields}>
-                            <Text style={styles.fieldLabels}>username:</Text>
-                            <TextInput style={styles.input} value={username} onChangeText={setUsername} placeholder="enter a new username"></TextInput>
+                            <Text style={styles.fieldLabels}>{dictionary.username}:</Text>
+                            <TextInput style={styles.input} value={username} onChangeText={setUsername} placeholder={dictionary.username_placeholder}></TextInput>
                         </View>
                         <View style={styles.fields}>
-                            <Text style={styles.fieldLabels}>gender:</Text>
+                            <Text style={styles.fieldLabels}>{dictionary.gender}:</Text>
                             <View style={{flex:0, flexDirection:'row'}}>
                                 <Pressable onPress={()=> gender === 'Male' ? setGender('') : setGender('Male')} style={{borderColor: 'black', borderWidth: gender=== 'Male' ? 1 : 0, marginRight:20, padding:5}}>
-                                    <Text>male</Text>
+                                    <Text>{dictionary.male}</Text>
                                 </Pressable>
                                 <Pressable onPress={()=> gender === 'Female' ? setGender('') : setGender('Female')} style={{borderColor: 'black', borderWidth: gender=== 'Female' ? 1 : 0, marginRight:20, padding:5}}>
-                                    <Text>female</Text>
+                                    <Text>{dictionary.female}</Text>
                                 </Pressable>    
                             </View>
                         </View>
                         <Pressable style={({pressed}) => [styles.center, styles.buttons, {minHeight:50,backgroundColor: pressed? "#ffffff" : 'transparent'}]} onPress={updateDetails} >
-                                <Text style={[styles.buttonTexts, {color:'black'}]} >Update </Text>
+                                <Text style={[styles.buttonTexts, {color:'black'}]} >{dictionary.update} </Text>
                         </Pressable>
                         
                     </SafeAreaView>

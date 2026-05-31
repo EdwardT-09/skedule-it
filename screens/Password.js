@@ -3,6 +3,7 @@ import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,Scroll
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import useDictionary from '../hook/useDictionary.js';
 import {supabase} from '../config/initSupabase.js';
 import {validatePassword, validatePassword2 } from '../util/validation.js';
 import Header from '../components/Header.js';
@@ -18,15 +19,17 @@ export default function Password({navigation}){
     const [newPasswordError, setNewPasswordError] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
+    const dictionary = useDictionary();
+
     const changePassword = async() => {
                 
         const user = (await supabase.auth.getUser()).data.user;
 
         if(!user) return;
 
-        const currentPasswordErr =  validatePassword(currentPassword);
-        const newPasswordErr =  validatePassword(newPassword);
-        const confirmPasswordErr =  validatePassword(newPassword, confirmPassword);
+        const currentPasswordErr =  validatePassword(currentPassword, dictionary);
+        const newPasswordErr =  validatePassword(newPassword, dictionary);
+        const confirmPasswordErr =  validatePassword(newPassword, confirmPassword, dictionary);
 
         setCurrentPasswordError(currentPasswordErr);
         setNewPasswordError(newPasswordErr);
@@ -62,31 +65,31 @@ export default function Password({navigation}){
                     <View style={[styles.container, {marginTop:'10%', marginBottom:'8%'}]}>
                         <View style={[styles.titleContainer]}>
                             <View style={{paddingLeft: '5%'}}>
-                                <Text style={styles.subtitle}>settings</Text>
+                                <Text style={styles.subtitle}>{dictionary.settings}</Text>
                                 <Text style={styles.title}>
-                                    change password
+                                    {dictionary.update}{dictionary.password}
                                 </Text>
                             </View>
                         </View>
                             <SafeAreaView style={{paddingHorizontal: 15}}>
                                 <View style={styles.fields}>
-                                    <Text style={styles.fieldLabels}>Current Password: </Text>
-                                    <TextInput style={styles.input} secureTextEntry={true} value={currentPassword} onChangeText={setCurrentPassword} placeholder='enter your current password'></TextInput>
+                                    <Text style={styles.fieldLabels}>{dictionary.current_password}: </Text>
+                                    <TextInput style={styles.input} secureTextEntry={true} value={currentPassword} onChangeText={setCurrentPassword} placeholder={dictionary.current_password_placeholder}></TextInput>
                                     {currentPasswordError? (<Text style={styles.errorText}>{currentPasswordError}</Text>) : null}
                                 </View>
                                 <View style={styles.fields}>
-                                    <Text style={styles.fieldLabels}>New Password: </Text>
-                                    <TextInput style={styles.input} secureTextEntry={true} value={newPassword} onChangeText={setNewPassword} placeholder='enter your new password'></TextInput>
+                                    <Text style={styles.fieldLabels}>{dictionary.new_password}: </Text>
+                                    <TextInput style={styles.input} secureTextEntry={true} value={newPassword} onChangeText={setNewPassword} placeholder={dictionary.new_password}></TextInput>
                                     {newPasswordError? (<Text style={styles.errorText}>{newPasswordError}</Text>) : null}
                                 </View>
                                 <View style={styles.fields}>
-                                    <Text style={styles.fieldLabels}>Confirm New Password: </Text>
-                                    <TextInput style={styles.input} secureTextEntry={true} value={confirmPassword} onChangeText={setConfirmPassword} placeholder='enter your new password again'></TextInput>
+                                    <Text style={styles.fieldLabels}>{dictionary.confirm_new_password}: </Text>
+                                    <TextInput style={styles.input} secureTextEntry={true} value={confirmPassword} onChangeText={setConfirmPassword} placeholder={dictionary.confirm_new_psw_placeholder}></TextInput>
                                     {confirmPasswordError? (<Text style={styles.errorText}>{confirmPasswordError}</Text>) : null}
                                 </View>
                                 <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {opacity: pressed ? 0.5 : 1}, ]} onPress={changePassword}>
                                     <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
-                                        <Text style={styles.buttonTexts} >LET'S GO </Text>
+                                        <Text style={styles.buttonTexts} >{dictionary.lets_go} </Text>
                                     </View>
                                 </Pressable>
                             </SafeAreaView>

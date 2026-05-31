@@ -4,6 +4,7 @@ import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import useDictionary from '../hook/useDictionary.js'
 import {supabase} from '../config/initSupabase.js';
 import { validateTitle, validateDate, validatePriority } from '../util/validation.js';
 import Header from '../components/Header.js';
@@ -34,6 +35,8 @@ export default function AddTask ({navigation, route}){
 
     const taskID = route?.params?.taskID;
     const method = route?.params?.method;
+
+    const dictionary = useDictionary();
 
     console.log(taskID);
      useEffect(()=> {
@@ -114,9 +117,9 @@ export default function AddTask ({navigation, route}){
     }
 
     const validateFields = () =>{
-        const titleErr = validateTitle(title);
-        const dateErr = validateDate(date);
-        const priorityErr = validatePriority(priority);
+        const titleErr = validateTitle(title, dictionary);
+        const dateErr = validateDate(date, dictionary);
+        const priorityErr = validatePriority(priority, dictionary);
 
         if (titleErr == null && dateErr == null && priorityErr == null){
             submitTask();
@@ -201,21 +204,21 @@ export default function AddTask ({navigation, route}){
                 <View style={[styles.container, ]}>
                     <View style={[styles.titleContainer]}>
                         <View style={{paddingHorizontal: '5%'}}>
-                            <Text style={styles.subtitle}>let's go</Text>
+                            <Text style={styles.subtitle}>{dictionary.lets_go}</Text>
                             <Text style={styles.title}>
-                                add task
+                                {dictionary.add_task}
                             </Text>
                         </View>
                     </View>
                         <ScrollView style={{height:'65%'}}>
                             <SafeAreaView style={{paddingHorizontal: 15}}>
                                 <View style={styles.fields}>
-                                    <Text style={styles.fieldLabels}>title:</Text>
-                                    <TextInput style={styles.input} placeholder='enter a title' value={title} onChangeText={setTitle}></TextInput>
+                                    <Text style={styles.fieldLabels}>{dictionary.title}:</Text>
+                                    <TextInput style={styles.input} placeholder={dictionary.title_placeholder} value={title} onChangeText={setTitle}></TextInput>
                                     {titleError ? (<Text style={styles.errorText}>{titleError}</Text>) : null}
                                 </View>
                                 <View style={styles.fields}>
-                                    <Text style={styles.fieldLabels}>date:</Text>
+                                    <Text style={styles.fieldLabels}>{dictionary.date}:</Text>
                                     <Pressable style={{backgroundColor:'transparent'}} onPress={showDatePicker} ><View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}><Text>{date.getDate()}/{date.getMonth() + 1}/{date.getFullYear()}</Text></View></Pressable>
                                     {show && (
                                     <DateTimePicker
@@ -228,14 +231,14 @@ export default function AddTask ({navigation, route}){
                                 {dateError ? (<Text style={styles.errorText}>{dateError}</Text>) : null}
                                 </View>
                                 <View style={styles.fields}>
-                                    <Text style={styles.fieldLabels}>recurring:</Text>
+                                    <Text style={styles.fieldLabels}>{dictionary.recurring}:</Text>
                                     <View style={{flex:0, flexDirection:'row', justifyContent:'space-around'}}>
                                         {weekDay.map((day) =>(<Pressable key={day} onPress={()=> toggleDay(day)} style={{ borderColor: days.includes(day) ? "black" : null, padding:10, borderWidth: days.includes(day) ? 1 : null}}><Text style={{fontFamily:'JetBrainsMono_400Regular', fontSize:12}}>{day}</Text></Pressable>))}
                                     </View>
                                 </View>
                                 <View style={styles.fields}>
                                     <View style={{flex:0, flexDirection:'row', justifyContent:'space-between'}}>
-                                        <Text style={styles.fieldLabels}>priority:</Text>
+                                        <Text style={styles.fieldLabels}>{dictionary.priority}:</Text>
                                         <Pressable onPress = {() => showPriorityTip()} style={[styles.borderButton, {paddingVertical:2, borderRadius:20, backgroundColor: null, opacity: tips ? 0.5 : 1,}]}><Text>?</Text></Pressable>
                                     </View>
                                     <View style={{flex:0, flexDirection:'row', }}>
@@ -248,7 +251,7 @@ export default function AddTask ({navigation, route}){
                                 </View>
                                 <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {opacity: pressed? 0.5 : 1, backgroundColor:'black'},]} onPress={validateFields}>
                                             <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
-                                                <Text style={[styles.buttonTexts, {color:'white'}]} >Add </Text>
+                                                <Text style={[styles.buttonTexts, {color:'white'}]} >{dictionary.add}</Text>
                                             </View>
                                 </Pressable>
                             </SafeAreaView>

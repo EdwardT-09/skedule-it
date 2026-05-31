@@ -3,6 +3,7 @@ import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,Scroll
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import useDictionary from '../hook/useDictionary.js';
 import { isEmpty } from '../util/common.js';
 import { validateUsername, validateEmail, validateGender, validatePassword, validatePassword2 } from '../util/validation.js';
 import {onRegister} from '../database/auth.js'
@@ -28,12 +29,14 @@ export default function Register({navigation}) {
     const [showPassword, setShowPassword] = useState(true);
     const [showConfirmPassword, setShowConfirmPassword] = useState(true);
 
+    const dictionary = useDictionary();
+
     const handleRegister = async() => {
-        const usernameErr = validateUsername(username);
-        const emailErr = validateEmail(email);
-        const genderErr = validateGender(gender);
-        const passwordErr = validatePassword(password);
-        const password2Err = validatePassword2(password, password2);
+        const usernameErr = validateUsername(username, dictionary);
+        const emailErr = validateEmail(email, dictionary);
+        const genderErr = validateGender(gender, dictionary);
+        const passwordErr = validatePassword(password, dictionary);
+        const password2Err = validatePassword2(password, password2, dictionary);
 
         setUsernameError(usernameErr);
         setEmailError(emailErr);
@@ -69,44 +72,44 @@ export default function Register({navigation}) {
                             <View style={[styles.container, {marginBottom:100,},]}>
                                 <View style={[styles.titleContainer, {paddingHorizontal:'7%', flex:0, flexDirection:'row',}]}>
                                     <View style={{marginRight:'15%'}}>
-                                        <Text style={styles.title}>join the club!</Text>
-                                        <Text style={styles.desc}>start your study journey with us</Text>
+                                        <Text style={styles.title}>{dictionary.join_the_club}</Text>
+                                        <Text style={styles.desc}>{dictionary.register_desc}</Text>
                                     </View>
                                     <Image
                                     source = {require('../assets/stars.png')}></Image>
                                 </View>
                                     <SafeAreaView style={{paddingHorizontal: 20}}>
                                         <View style={styles.fields}>
-                                            <Text style={styles.fieldLabels}>username:</Text>
-                                            <TextInput style ={styles.input} value={username} onChangeText={setUsername} placeholder='enter a username'></TextInput>
+                                            <Text style={styles.fieldLabels}>{dictionary.username}:</Text>
+                                            <TextInput style ={styles.input} value={username} onChangeText={setUsername} placeholder={dictionary.username_placeholder}></TextInput>
                                             {usernameError? (<Text style={styles.errorText}>{usernameError}</Text>) : null}
                                         </View>
                                         <View style={styles.fields}>
-                                            <Text style={styles.fieldLabels}>email:</Text>
-                                            <TextInput style ={styles.input} value={email} onChangeText={setEmail} placeholder='enter your email'></TextInput>
+                                            <Text style={styles.fieldLabels}>{dictionary.email}:</Text>
+                                            <TextInput style ={styles.input} value={email} onChangeText={setEmail} placeholder={dictionary.email_placeholder}></TextInput>
                                             {emailError? (<Text style={styles.errorText}>{emailError}</Text>) : null}
                                         </View>
                                         <View style={styles.fields}>
-                                            <Text>gender:</Text>
+                                            <Text>{dictionary.gender}:</Text>
                                             <View style={{flex:0, flexDirection:'row', marginTop:10,}}>
-                                                <Pressable onPress={()=> gender === 'Male' ? setGender('') : setGender('Male')} style={{borderColor: 'black', borderWidth: gender=== 'Male' ? 1 : 0, marginRight:20, padding:5}}><Text style={{color: gender === 'Male'? 'black' : 'gray'}}>male</Text></Pressable>
-                                                <Pressable onPress={()=> gender === 'Female' ? setGender('') : setGender('Female')} style={{borderColor: 'black', borderWidth: gender=== 'Female' ? 1 : 0, padding:5}}><Text style={{color: gender === 'Female'? 'black' : 'gray'}}>female</Text></Pressable>
+                                                <Pressable onPress={()=> gender === 'Male' ? setGender('') : setGender('Male')} style={{borderColor: 'black', borderWidth: gender=== 'Male' ? 1 : 0, marginRight:20, padding:5}}><Text style={{color: gender === 'Male'? 'black' : 'gray'}}>{dictionary.male}</Text></Pressable>
+                                                <Pressable onPress={()=> gender === 'Female' ? setGender('') : setGender('Female')} style={{borderColor: 'black', borderWidth: gender=== 'Female' ? 1 : 0, padding:5}}><Text style={{color: gender === 'Female'? 'black' : 'gray'}}>{dictionary.female}</Text></Pressable>
                                             </View>
                                             {genderError? (<Text style={styles.errorText}>{genderError}</Text>) : null}
                                         </View>
                                         <View style={styles.fields}>
-                                            <Text style={styles.fieldLabels}>password:</Text>
-                                            <TextInput style ={styles.input} secureTextEntry={showPassword} value={password} onChangeText={setPassword} placeholder='enter a password'></TextInput>
+                                            <Text style={styles.fieldLabels}>{dictionary.password}:</Text>
+                                            <TextInput style ={styles.input} secureTextEntry={showPassword} value={password} onChangeText={setPassword} placeholder={dictionary.password_placeholder}></TextInput>
                                             <Pressable onPress={()=> setShowPassword(!showPassword)}>
-                                                <Text style={styles.visiblePassword}>{showPassword ? 'show' : 'hide'} password</Text>
+                                                <Text style={styles.visiblePassword}>{showPassword ? dictionary.show : dictionary.hide }{dictionary.password}</Text>
                                             </Pressable>
                                             {passwordError? (<Text style={styles.errorText}>{passwordError}</Text>) : null}
                                         </View>
                                         <View style={styles.fields}>
-                                            <Text style={styles.fieldLabels}>confirm password:</Text>
-                                            <TextInput style ={styles.input} secureTextEntry={showConfirmPassword} value={password2} onChangeText={setPassword2} placeholder='enter the password again'></TextInput>
+                                            <Text style={styles.fieldLabels}>{dictionary.confirm_password}:</Text>
+                                            <TextInput style ={styles.input} secureTextEntry={showConfirmPassword} value={password2} onChangeText={setPassword2} placeholder={dictionary.confirm_password_placeholder}></TextInput>
                                             <Pressable onPress={()=> setShowConfirmPassword(!showConfirmPassword)}>
-                                                <Text style={styles.visiblePassword}>{showConfirmPassword ? 'show' : 'hide'} password</Text>
+                                                <Text style={styles.visiblePassword}>{showConfirmPassword ? dictionary.show : dictionary.hide} {dictionary.password}</Text>
                                             </Pressable>
                                             {password2Error? (<Text style={styles.errorText}>{password2Error}</Text>) : null}
                                             {generalError? (<Text style={styles.errorText}>{generalError}</Text>) : null}
@@ -114,13 +117,13 @@ export default function Register({navigation}) {
                                         
                                         <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {backgroundColor: pressed? 'gray' : 'black'}]} onPress={handleRegister}>
                                             <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
-                                                <Text style={[styles.buttonTexts, {color:'white'}]} >LET'S GO </Text>
+                                                <Text style={[styles.buttonTexts, {color:'white'}]} >{dictionary.lets_go}</Text>
                                             </View>
                                         </Pressable>
                                         <View style={[{flexDirection:'row'}, {alignItems:'center', marginTop:'5%'}]}>
-                                            <Text> already have an account? </Text>
+                                            <Text>{dictionary.have_account_prompt}</Text>
                                             <Pressable onPress={()=> navigation.navigate('SignIn')}>
-                                                <Text style={styles.links}>sign in</Text>
+                                                <Text style={styles.links}>{dictionary.sign_in}</Text>
                                             </Pressable>
                                         </View>
                                     </SafeAreaView>

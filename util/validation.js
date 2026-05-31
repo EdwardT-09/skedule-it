@@ -1,29 +1,33 @@
-import {isEmpty} from './common.js';
 
-export const validateUsername = (username) => {
+import {isEmpty} from './common.js';
+import useDictionary from '../hook/useDictionary.js';
+
+export const validateUsername = (username, dictionary) => {
     if (isEmpty(username)){
-        return "The username field is empty.";
+        return dictionary.username_empty_error;
     } 
 
     return null;
 };
 
-export const validateEmail = (email) => {
+export const validateEmail = (email, dictionary) => {
+
     const pattern = /^[\w\-\.]+@([\w-]+\.)+[\w-]{2,}$/;
     if (isEmpty(email)){
-        return "The email field is empty.";
+        return dictionary.email_empty_error;
     } 
 
     if(!pattern.test(email)){
-        return "The format is wrong. Please follow the example: johndoe@example.com";
+        return dictionary.email_format_error;
     }
 
     return null;
 };
 
-export const validateGender = (gender) => {
+export const validateGender = (gender, dictionary) => {
+
     if (isEmpty(gender)){
-        return "The gender field is empty.";
+        return dictionary.gender_empty_error;
     } 
 
     return null;
@@ -31,61 +35,62 @@ export const validateGender = (gender) => {
 
 
 
-export const validatePassword = (password) => {
+export const validatePassword = (password, dictionary) => {
+
     const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[%&?_#=-])[A-Za-z\d%&?_#=-]{8,}$/;
     if (isEmpty(password)){
-        return "The password field is empty.";
+        return dictionary.password_empty_error;
     } 
 
     if(!pattern.test(password)){
-        return "The password must have a minumum of 8 characters with at least one uppercase and lowercase letter, one number and one special character.";
-    }
+        
+        return dictionary.password_format_error;    }
     return null;
 };
 
-export const validatePassword2 = (password, password2) => {
+export const validatePassword2 = (password, password2, dictionary) => {
+
     const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[%&?_#=-])[A-Za-z\d%&?_#=-]{8,}$/;
     if (isEmpty(password2)){
-        return "The password confirmation field is empty.";
-    } 
-
+        return dictionary.confirm_password_empty_error;
+    }
     if(!pattern.test(password2)){
-        return "The password must have a minumum of 8 characters with at least one uppercase and lowercase letter, one number and one special character.";
+        return dictionary.password_format_error;
     }
 
     if (password !== password2){
-        return "The passwords do not match"
+        return dictionary.confirm_password_match_error
     }
     return null;
 };
 
-export const validateTitle = (title) =>{
+export const validateTitle = (title, dictionary) =>{
+
     if(isEmpty(title)){
-        console.log('validate title')
-        return "The title field is empty";
+        return dictionary.title_empty_error;
     }
 
     return null;
 }
 
-export const validateDate = (date) =>{
+export const validateDate = (date, dictionary) =>{
+
     const currentDate = new Date();
   
     date.setHours(0,0,0,0);
     currentDate.setHours(0,0,0,0);
 
     if(date < currentDate){
-        console.log('validate date')
-        return "The date field must be from"+ currentDate.getDate() +"/"+  (currentDate.getMonth() + 1) + "/" + currentDate.getFullYear() + "onwards";
+        return dictionary.date_error+ currentDate.getDate() +"/"+  (currentDate.getMonth() + 1) + "/" + currentDate.getFullYear() + "onwards";
     }
 
     return null;
 }
 
-export const validatePriority = (priority) =>{
+export const validatePriority = (priority, dictionary) =>{
+
     if(isEmpty(priority)){
-        console.log('validate priority');
-        return "The priority field is empty";
+        return dictionary.priority_empty_error;
     }
     return null;
 }

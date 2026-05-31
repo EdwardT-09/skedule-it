@@ -1,13 +1,15 @@
-import React, {useState} from 'react';
+import React, {use, useState} from 'react';
 import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 
+import useDictionary from '../hook/useDictionary.js';
 import {supabase} from '../config/initSupabase.js';
 import Header from '../components/Header.js';
 import Navigation from '../components/Nav.js';
 import styles from '../assets/style.js';
 
 export default function Languages({navigation}){
+    const dictionary = useDictionary();
     const [isLanguage, setIsLanguage] = useState('en');
     const saveLanguage  = async(lang) => {
         const user = (await supabase.auth.getUser()).data.user;
@@ -21,6 +23,7 @@ export default function Languages({navigation}){
                 language: lang,
             })
         
+        const dictionary = useDictionary();
     }
     return(
     <View style={{flex:1}}>
@@ -30,9 +33,9 @@ export default function Languages({navigation}){
                 <View style={[styles.container, {marginTop:'10%'}]}>
                     <View style={[styles.titleContainer, ]}>
                         <View style={{paddingLeft: '5%'}}>
-                            <Text style={[styles.subtitle,]}>settings</Text>
+                            <Text style={[styles.subtitle,]}>{dictionary.settings}</Text>
                             <Text style={styles.title}>
-                                change language
+                                {dictionary.updated} {dictionary.languages}
                             </Text>
                         </View>
                     </View>
