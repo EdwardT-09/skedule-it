@@ -11,6 +11,9 @@ import Landing from './screens/Landing.js';
 import SignIn from './screens/SignIn.js';
 import Register from './screens/Register.js';
 import Home from './screens/Home.js';
+import Subjects from './screens/Subjects.js';
+import Subject from './screens/Subject.js';
+import AddSubject from './screens/AddSubject.js';
 import Tasks from './screens/Tasks.js';
 import AddTask from './screens/AddTask.js';
 import Profile from './screens/Profile.js';
@@ -43,6 +46,9 @@ export default function App(){
         <Stack.Screen name="SignIn" component={SignIn}></Stack.Screen>
         <Stack.Screen name="Register" component={Register}></Stack.Screen>
         <Stack.Screen name="Home" component={Home}></Stack.Screen>
+        <Stack.Screen name="Subjects" component={Subjects}></Stack.Screen>
+        <Stack.Screen name="Subject" component={Subject}></Stack.Screen>
+        <Stack.Screen name="AddSubject" component={AddSubject}></Stack.Screen>
         <Stack.Screen name="Tasks" component={Tasks}></Stack.Screen>
         <Stack.Screen name="AddTask" component={AddTask}></Stack.Screen>
         <Stack.Screen name="Profile" component={Profile}></Stack.Screen>

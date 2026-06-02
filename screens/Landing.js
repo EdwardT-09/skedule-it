@@ -1,14 +1,16 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { View, Text, Pressable, StyleSheet, ImageBackground, Image } from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 
 import useDictionary from '../hook/useDictionary.js';
 import styles from '../assets/style.js';
+import {isLoggedIn} from '../util/common.js';
 
 
 export default function Landing({ navigation }) {
     const dictionary= useDictionary();
 
+    useEffect(()=> {isLoggedIn(navigation)}, []);
   return (
         <View style={{flex:1,}}>
             <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172', ]} style={{flex:1,}}>

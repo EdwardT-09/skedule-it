@@ -28,7 +28,7 @@ export default function Navigation(){
                         <Text style={styles.navLabel}>{dictionary.schedule}</Text>
                     </View>
                     <View style={{flex:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-                        <Pressable onPress={() => navigation.navigate('Home')}  style={() => [activeTab === "" ? styles.navActive: styles.navButton, {backgroundColor: activeTab === "" ? '#c1c1c1' : 'white'}]}>
+                        <Pressable onPress={() => navigation.navigate('Subjects')}  style={() => [activeTab === "" ? styles.navActive: styles.navButton, {backgroundColor: activeTab === "" ? '#c1c1c1' : 'white'}]}>
                             <Image source={require('../assets/Home.png')}></Image>
                         </Pressable>
                         <Text style={[styles.navLabel,{color: activeTab === "" ? '#d3b098' : 'black', }]}>{dictionary.study}</Text>

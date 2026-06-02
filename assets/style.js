@@ -211,6 +211,24 @@ const styles= StyleSheet.create({
         shadowColor: '#ffcd07',
     },
 
+    //subject
+    subjectContainer:{
+        flex:0,
+        flexDirection:'row', 
+        paddingHorizontal:'5%', 
+        justifyContent:'space-between',
+        flexWrap:'wrap',
+        paddingVertical:'5%',
+    },
+
+    subjectItems:{
+        width:150, 
+        flex:0, 
+        flexDirection:'column', 
+        justifyContent:'center',
+        alignItems:'center'
+    },
+
 
     //profile
     profileName:{
@@ -289,7 +307,7 @@ const styles= StyleSheet.create({
     },
 
 
-    taskMenuContainer:{
+    modalMenuContainer:{
         backgroundColor:'rgb(255, 255, 255)',
         // borderColor:'black',
         // borderWidth:1,
@@ -303,7 +321,7 @@ const styles= StyleSheet.create({
         elevation:10,
     },
 
-    taskMenuItem:{
+    modalMenuItem:{
         flex:0,
         flexDirection:'row',
         alignItems:'center',
@@ -318,12 +336,12 @@ const styles= StyleSheet.create({
         paddingTop:20,
     },
 
-    taskMenuImage:{
+    modalMenuImage:{
         marginVertical:'5%',
         marginRight:'5%',
     },
 
-    taskMenuLabels:{
+    modalMenuLabels:{
         fontSize:16,
         fontFamily: 'Poppins_400Regular',
     },

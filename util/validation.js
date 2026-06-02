@@ -94,3 +94,20 @@ export const validatePriority = (priority, dictionary) =>{
     }
     return null;
 }
+
+export const validateSubjectCode = (subjectCode, dictionary) =>{
+    if(isEmpty(subjectCode)){
+        return dictionary.subjectCode_empty_error;
+    }
+
+    return null;
+}
+
+export const validateSubject = (name, dictionary) =>{
+
+    if(isEmpty(name)){
+        return dictionary.subject_empty_error;
+    }
+
+    return null;
+}
