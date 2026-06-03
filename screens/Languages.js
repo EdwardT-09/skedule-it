@@ -45,7 +45,6 @@ export default function Languages({navigation}){
 
                 </View>
             </View>
-            <Navigation/>
         </LinearGradient>
     </View>
     )

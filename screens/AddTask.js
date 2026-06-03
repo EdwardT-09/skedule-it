@@ -210,7 +210,7 @@ export default function AddTask ({navigation, route}){
                             </Text>
                         </View>
                     </View>
-                        <ScrollView style={{height:'65%'}}>
+                        <ScrollView style={{height:'70%'}}>
                             <SafeAreaView style={{paddingHorizontal: 15}}>
                                 <View style={styles.fields}>
                                     <Text style={styles.fieldLabels}>{dictionary.title}:</Text>
@@ -258,7 +258,6 @@ export default function AddTask ({navigation, route}){
                         </ScrollView>
                     </View>
                 </View>
-                <Nav></Nav>
                 <Modal animationType="fade" transparent={true} visible={tips} onRequestClose={()=>setTips(!tips)}>
                     <View style={styles.priorityPopBack}>
                         <View style={styles.priorityPopContainer}>

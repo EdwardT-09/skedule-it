@@ -13,38 +13,41 @@ export default function Navigation(){
 
     const dictionary = useDictionary();
     return(
-        <View style={styles.navContainer}>
-            <View style={{flex:0, flexDirection:'row', justifyContent:'space-around', }}>
-                    <View style={{flex:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-                        <Pressable onPress={() => {navigation.navigate('Home')}}  style={() => [activeTab === "Home" ? styles.navActive : styles.navButton, {backgroundColor: activeTab === "Home" ?  '#c1c1c1' : 'white', }]}>
-                            <Image source={activeTab === "Home" ? require('../assets/HomeWhite.png') : require('../assets/Home.png')}></Image>
+        <View style={styles.nav}>
+            <View style={styles.navContainer}>
+                <View style={{flex:0, flexDirection:'row', justifyContent:'space-around', }}>
+                        <View style={{flex:0, flexDirection: 'column' , justifyContent:'center', alignItems:'center'}}>
+                            <Pressable onPress={() => {navigation.navigate('Home')}}  style={() => [activeTab === "Home" ? styles.navActive : styles.navButton, {backgroundColor: activeTab === "Home" ?  '#eeeeee' : '#1e1e1e', flex:0, flexDirection: activeTab  === "Home" ?'row' : null , justifyContent:'center', alignItems:'center'}]}>
+                                <Image source={activeTab === "Home" ? require('../assets/Home.png') : require('../assets/HomeWhite.png')}></Image>
+                                <Text style={[styles.navLabel, {display: activeTab == "Home" ? 'flex': 'none', marginLeft:'2.5%'}]}>{dictionary.home}</Text>
+                            </Pressable>
+                        </View>
+                        <View style={{flex:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+                            <Pressable onPress={() => navigation.navigate('Subjects')}  style={() => [activeTab === "" ? styles.navActive: styles.navButton, {backgroundColor: activeTab === "Subjects" ? '#eeeeee' : '#1e1e1e', flex:0, flexDirection: activeTab  === "Subjects" ?'row' : null , justifyContent:'center', alignItems:'center'}]}>
+                                <Image source={activeTab === "Subjects" ? require('../assets/Book.png') : require('../assets/BookWhite.png')}></Image>
+                                <Text style={[styles.navLabel, {display: activeTab == "Subjects" ? 'flex': 'none', marginLeft:'2.5%'}]}>{dictionary.study}</Text>
+                            </Pressable>
+                        </View>
+                        <View style={{flex:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+                            <Pressable onPress={() => navigation.navigate('Home')} style={() => [activeTab === "Schedule" ? styles.navActive: styles.navButton, {backgroundColor: activeTab === "Schedule" ? '#eeeeee' : '#1e1e1e', flex:0, flexDirection: activeTab  === "Schedule" ?'row' : null , justifyContent:'center', alignItems:'center'}]}>
+                                <Image source={activeTab === "Schedule" ? require('../assets/Calendar.png') : require('../assets/CalendarWhite.png')}></Image>
+                                <Text style={[styles.navLabel, {display: activeTab == "Schedule" ? 'flex': 'none', marginLeft:'2.5%'}]}>{dictionary.schedule}</Text>
                         </Pressable>
-                        <Text style={styles.navLabel}>{dictionary.home}</Text>
-                    </View>
-                    <View style={{flex:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-                        <Pressable onPress={() => navigation.navigate('Home')} style={() => [activeTab === "Schedule" ? styles.navActive: styles.navButton, {backgroundColor: activeTab === "Schedule" ? '#c1c1c1' : 'white'}]}>
-                            <Image source={activeTab === "Schedule" ? require('../assets/CalendarWhite.png') : require('../assets/Calendar.png')}></Image>
-                        </Pressable>
-                        <Text style={styles.navLabel}>{dictionary.schedule}</Text>
-                    </View>
-                    <View style={{flex:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-                        <Pressable onPress={() => navigation.navigate('Subjects')}  style={() => [activeTab === "" ? styles.navActive: styles.navButton, {backgroundColor: activeTab === "" ? '#c1c1c1' : 'white'}]}>
-                            <Image source={require('../assets/Home.png')}></Image>
-                        </Pressable>
-                        <Text style={[styles.navLabel,{color: activeTab === "" ? '#d3b098' : 'black', }]}>{dictionary.study}</Text>
-                    </View>
-                    <View style={{flex:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-                        <Pressable onPress={() => {navigation.navigate('Tasks')}}  style={() => [activeTab === "Tasks" ? styles.navActive: styles.navButton, {backgroundColor: activeTab === "Tasks" ? '#c1c1c1' : 'white'}]}>
-                            <Image source={activeTab === "Tasks" ? require('../assets/HomeWhite.png'):  require('../assets/Home.png')}></Image>
-                        </Pressable>
-                        <Text style={styles.navLabel}>{dictionary.tasks}</Text>
-                    </View>
-                    <View style={{flex:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-                        <Pressable onPress={() => { navigation.navigate('Profile')}}  style={() => [activeTab === "Profile" ? styles.navActive: styles.navButton, {backgroundColor: activeTab === "Profile" ?'#c1c1c1' : 'white'}]}>
-                            <Image source={activeTab === "Profile" ? require('../assets/UserWhite.png'): require('../assets/User.png')}></Image>
-                        </Pressable>
-                        <Text style={styles.navLabel}>{dictionary.profile}</Text>
-                    </View>
+                        </View>
+                        <View style={{flex:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+                            <Pressable onPress={() => {navigation.navigate('Tasks')}}  style={() => [activeTab === "Tasks" ? styles.navActive: styles.navButton, {backgroundColor: activeTab === "Tasks" ? '#eeeeee' : '#1e1e1e', flex:0, flexDirection: activeTab  === "Tasks" ?'row' : null , justifyContent:'center', alignItems:'center'}]}>
+                                <Image source={activeTab === "Tasks" ? require('../assets/Clipboard.png'):  require('../assets/ClipboardWhite.png')}></Image>
+                                <Text style={[styles.navLabel, {display: activeTab == "Tasks" ? 'flex': 'none', marginLeft:'2.5%'}]}>{dictionary.tasks}</Text>
+                            </Pressable>
+
+                        </View>
+                        <View style={{flex:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+                            <Pressable onPress={() => { navigation.navigate('Profile')}}  style={() => [activeTab === "Profile" ? styles.navActive: styles.navButton, {backgroundColor: activeTab === "Profile" ?'#eeeeee' : '#1e1e1e', flex:0, flexDirection: activeTab  === "Profile" ?'row' : null , justifyContent:'center', alignItems:'center'}]}>
+                                <Image source={activeTab === "Profile" ? require('../assets/User.png'): require('../assets/UserWhite.png')}></Image>
+                                <Text style={[styles.navLabel, {display: activeTab == "Profile" ? 'flex': 'none', marginLeft:'2.5%'}]}>{dictionary.profile}</Text>
+                            </Pressable>
+                        </View>
+                </View>
             </View>
         </View>
     );

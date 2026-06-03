@@ -42,7 +42,7 @@ export default function Tasks ({navigation}){
                         </View>
                     </View>
                 </View>
-                    <ScrollView style={{height:'65%'}}>
+                    <ScrollView style={{height:'60%'}}>
                         <Text style={styles.timeLabel}>{dictionary.today}</Text>
                         {todayTasks.map((task)=> (<View style={[styles.taskItem]} key={task.id}>
                             <View style={{flex:0, flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>

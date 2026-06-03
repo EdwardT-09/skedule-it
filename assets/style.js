@@ -173,28 +173,33 @@ const styles= StyleSheet.create({
 
     //navigation
 
+    nav:{
+        margin:'5%',
+        position:'relative',
+    },
+
     navContainer:{
         position:'absolute',
-        bottom:0,
+        bottom:25,
         width:'100%',
-        backgroundColor:'rgb(249, 249, 249)',
-        paddingVertical:30,
+        backgroundColor:'#1e1e1e',
+        paddingVertical:10,
+        paddingHorizontal:'2.5%',
         // borderColor:'black',
         // borderWidth:1,
-        borderRadius:20,
         elevation:10,
         shadowColor: '#000', 
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
-
+        borderRadius:50,
     },
 
     navButton:{
         borderRadius:50,
         // borderColor: 'black',
         // borderWidth:1,
-        padding:10,
+        padding:7,
     },
 
     navLabel:{

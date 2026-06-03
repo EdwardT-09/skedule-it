@@ -48,7 +48,7 @@ export default function Subjects ({navigation}){
                         <Text style={styles.subtitle}>{dictionary.classes}</Text>
                         <Text style={styles.title}>{dictionary.subjects}</Text>
                     </View>
-                    <ScrollView contentContainerStyle={[styles.subjectContainer, {height:'50%'}]}>
+                    <ScrollView contentContainerStyle={[styles.subjectContainer, {height:'60%'}]}>
                         {subjects.map((subject) =>  (
                             <Pressable key={subject.id} style={styles.subjectItems} onPress={()=> navigation.navigate('Subject', {subjectID: subject.id})}>
                                 <Image source={require('../assets/Folder.png')}></Image>
