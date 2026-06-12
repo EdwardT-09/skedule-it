@@ -1,0 +1,56 @@
+import React, {useState, useEffect} from 'react';
+import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView, Switch} from "react-native";
+import { LinearGradient } from 'expo-linear-gradient';
+import Modal from 'react-native-modal'
+import Markdown from 'react-native-markdown-display';
+
+import useDictionary from '../hook/useDictionary.js';
+import {supabase} from '../config/initSupabase.js';
+import Header from '../components/Header.js';
+import styles from '../assets/style.js';
+
+
+export default function NotesViewer ({navigation, route}){
+    const fileName = route?.params?.fileName;
+    const subjectID = route?.params?.subjectID;
+    const [notes, setNotes] = useState('');
+
+
+    useEffect(()=> {
+        loadNotes();
+    }, [])
+
+    const loadNotes = async() => {
+
+        const user = (await supabase.auth.getUser()).data.user;
+
+        if(!user) return;
+
+        const {data, error} = await supabase
+        .from('notes')
+        .select('content')
+        .eq('file_name', `${user.id}/${subjectID}/${fileName}`)
+        .single()
+
+        console.log(typeof(data.content))
+        setNotes(data.content);
+    }
+
+       
+
+    return(
+        <View style={{flex:1,}}>
+            <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
+                <Header includeBack navigation={navigation}/>
+                <ScrollView style={{paddingHorizontal:'5%', maxHeight:'65%'}}>
+                    <View style={{paddingBottom:'25%'}}>
+                        <Markdown style={{marginBottom:'5%'}}>{notes}</Markdown>
+                    </View>
+                </ScrollView>
+                <Pressable onPress={() => navigation.navigate('Chat', { fileName :fileName, subjectID : subjectID})} style={{backgroundColor:'#1e1e1e', padding: 15, borderRadius: 50, marginTop: 20, width:65, height:65,  position: 'absolute', bottom:80, right:40, flex:0, alignItems:'center', justifyContent:'center'}}>
+                   <Image source={require('../assets/Chat.png')}/> 
+                </Pressable>
+            </LinearGradient>
+        </View>
+    );
+}

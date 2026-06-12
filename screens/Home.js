@@ -70,7 +70,7 @@ export default function Home({navigation}){
                         </View>
                         <ScrollView style={{height:"55%",}}>
                             {todayTasks.map((task) => (
-                                <View key={task.id} style={styles.taskItem}>
+                                <View key={task.id} style={styles.listItems}>
                                     <View style={{flex:0, flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
                                         <View>
                                             <Text style={styles.taskTitle}>{task.title}</Text>

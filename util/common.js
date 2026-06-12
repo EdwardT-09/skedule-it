@@ -18,4 +18,7 @@ export const isLoggedIn = async(navigation) => {
 }
 
 
-
+export function roundUpToDecimal(num, places) {
+  const factor = Math.pow(10, places);
+  return Math.ceil(num * factor) / factor;
+}

@@ -234,6 +234,19 @@ const styles= StyleSheet.create({
         alignItems:'center'
     },
 
+    listItems:{
+        borderColor:'black',
+        borderWidth:1,
+        margin:'2.5%',
+        padding:'3%',
+        borderRadius: 10,
+    },
+
+    fileTitle:{
+        color:'black',
+        fontSize:17,
+        fontFamily: 'Sintony_700Bold'
+    },
 
     //profile
     profileName:{
@@ -351,11 +364,21 @@ const styles= StyleSheet.create({
         fontFamily: 'Poppins_400Regular',
     },
 
+    chat:{
+        padding:12,
+        maxWidth:'85%',
+        marginBottom: 10,
+        borderRadius:12,
+    }
+
+
 
 
 
 
 
 })
+
+
 
 export default styles;

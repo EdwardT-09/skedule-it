@@ -14,6 +14,8 @@ import Home from './screens/Home.js';
 import Subjects from './screens/Subjects.js';
 import Subject from './screens/Subject.js';
 import AddSubject from './screens/AddSubject.js';
+import NotesViewer from './screens/NotesViewer.js';
+import Chat from './screens/Chat.js';
 import Tasks from './screens/Tasks.js';
 import AddTask from './screens/AddTask.js';
 import Profile from './screens/Profile.js';
@@ -49,6 +51,8 @@ export default function App(){
         <Stack.Screen name="Subjects" component={Subjects}></Stack.Screen>
         <Stack.Screen name="Subject" component={Subject}></Stack.Screen>
         <Stack.Screen name="AddSubject" component={AddSubject}></Stack.Screen>
+        <Stack.Screen name="NotesViewer" component={NotesViewer}></Stack.Screen>
+        <Stack.Screen name="Chat" component={Chat}></Stack.Screen>
         <Stack.Screen name="Tasks" component={Tasks}></Stack.Screen>
         <Stack.Screen name="AddTask" component={AddTask}></Stack.Screen>
         <Stack.Screen name="Profile" component={Profile}></Stack.Screen>
