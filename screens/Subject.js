@@ -220,7 +220,7 @@ Output ONLY the Markdown notes.
                         </View>
                         <View style={{flex:0, flexDirection:'row', alignSelf:'flex-end'}}>
                             <Pressable onPress={()=> {uploadDocument()}}>
-                                <Image source={require('../assets/Plus.png')} style={{width:20, height:20, padding:'8%', resizeMode:'contain'}}></Image>
+                                <Image source={require('../assets/Plus.png')} style={{width:50, height:50, padding:'8%', resizeMode:'contain'}}></Image>
                             </Pressable>
                             <Pressable onPress={() => {setMenuVisible(true)}}>
                                 <Image source={require('../assets/Menu.png')} style={{width:20, height:20, padding:'5%', resizeMode:'contain'}}></Image>

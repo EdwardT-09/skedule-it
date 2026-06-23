@@ -29,7 +29,7 @@ export default function Navigation(){
                             </Pressable>
                         </View>
                         <View style={{flex:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
-                            <Pressable onPress={() => navigation.navigate('Home')} style={() => [activeTab === "Schedule" ? styles.navActive: styles.navButton, {backgroundColor: activeTab === "Schedule" ? '#eeeeee' : '#1e1e1e', flex:0, flexDirection: activeTab  === "Schedule" ?'row' : null , justifyContent:'center', alignItems:'center'}]}>
+                            <Pressable onPress={() => navigation.navigate('Schedule')} style={() => [activeTab === "Schedule" ? styles.navActive: styles.navButton, {backgroundColor: activeTab === "Schedule" ? '#eeeeee' : '#1e1e1e', flex:0, flexDirection: activeTab  === "Schedule" ?'row' : null , justifyContent:'center', alignItems:'center'}]}>
                                 <Image source={activeTab === "Schedule" ? require('../assets/Calendar.png') : require('../assets/CalendarWhite.png')}></Image>
                                 <Text style={[styles.navLabel, {display: activeTab == "Schedule" ? 'flex': 'none', marginLeft:'2.5%'}]}>{dictionary.schedule}</Text>
                         </Pressable>

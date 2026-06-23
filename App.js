@@ -11,6 +11,8 @@ import Landing from './screens/Landing.js';
 import SignIn from './screens/SignIn.js';
 import Register from './screens/Register.js';
 import Home from './screens/Home.js';
+import Schedule from './screens/Schedule.js';
+import AddSchedule from './screens/AddSchedule.js';
 import Subjects from './screens/Subjects.js';
 import Subject from './screens/Subject.js';
 import AddSubject from './screens/AddSubject.js';
@@ -48,6 +50,8 @@ export default function App(){
         <Stack.Screen name="SignIn" component={SignIn}></Stack.Screen>
         <Stack.Screen name="Register" component={Register}></Stack.Screen>
         <Stack.Screen name="Home" component={Home}></Stack.Screen>
+        <Stack.Screen name="Schedule" component={Schedule}></Stack.Screen>
+        <Stack.Screen name="AddSchedule" component={AddSchedule}></Stack.Screen>
         <Stack.Screen name="Subjects" component={Subjects}></Stack.Screen>
         <Stack.Screen name="Subject" component={Subject}></Stack.Screen>
         <Stack.Screen name="AddSubject" component={AddSubject}></Stack.Screen>

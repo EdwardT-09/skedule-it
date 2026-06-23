@@ -102,21 +102,21 @@ export default function Home({navigation}){
                 </View>
                 <Navigation></Navigation>
                 <Modal style={{justifyContent: 'flex-end', margin:0}} transparent={true} isVisible={menuVisible} swipeDirection="down" onSwipeComplete={()=> setMenuVisible(false)} onBackdropPress={()=> setMenuVisible(false)} propagateSwipe={true}>
-                    <View style={[styles.taskMenuContainer]}>
+                    <View style={[styles.modalMenuContainer]}>
                         <Pressable onPress={()=>{setMenuVisible(false)}}>
                             <Image source={require('../assets/close.png')} style={{ flex:0, justifyContent:'center', alignSelf:'flex-end'}}></Image>
                         </Pressable>
                         <View>
-                            <Pressable onPress = {()=> navigation.navigate('AddTask', {taskID:selectedTask, method:'Edit'})} style={({pressed})=> ([styles.taskMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
-                                <Image source={require('../assets/Edit.png')} style={styles.taskMenuImage}></Image>
+                            <Pressable onPress = {()=> navigation.navigate('AddTask', {taskID:selectedTask, method:'Edit'})} style={({pressed})=> ([styles.modalMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
+                                <Image source={require('../assets/Edit.png')} style={styles.modalMenuImage}></Image>
                                 <Text style={styles.taskMenuLabels}>{dictionary.edit}</Text>
                             </Pressable>
-                            <Pressable onPress = {()=> navigation.navigate('AddTask', {taskID:selectedTask, method:'Add Subtask'})} style={({pressed})=> ([styles.taskMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
-                                <Image source={require('../assets/Plus.png')} style={[styles.taskMenuImage, {width:36, height:36}]}></Image>
+                            <Pressable onPress = {()=> navigation.navigate('AddTask', {taskID:selectedTask, method:'Add Subtask'})} style={({pressed})=> ([styles.modalMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
+                                <Image source={require('../assets/Plus.png')} style={[styles.modalMenuImage, {width:36, height:36}]}></Image>
                                 <Text style={styles.taskMenuLabels}>{dictionary.add_new_subtask}</Text>
                             </Pressable>
-                            <Pressable onPress= {()=> deleteTask(selectedTask)} style={({pressed})=> ([styles.taskMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
-                                <Image source={require('../assets/Trash.png')} style={styles.taskMenuImage}></Image>
+                            <Pressable onPress= {()=> deleteTask(selectedTask)} style={({pressed})=> ([styles.modalMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
+                                <Image source={require('../assets/Trash.png')} style={styles.modalMenuImage}></Image>
                                 <Text style={[styles.taskMenuLabels, {color:'#c14343'}]}>{dictionary.delete}</Text>
                             </Pressable>
                         </View>

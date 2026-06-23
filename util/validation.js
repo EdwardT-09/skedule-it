@@ -87,6 +87,19 @@ export const validateDate = (date, dictionary) =>{
     return null;
 }
 
+export const validateDateTime = (date, dictionary) =>{
+
+    const currentDate = new Date();
+    
+    console.log("selected:", date);
+    console.log("current:", currentDate);
+    if(date < currentDate){
+        return dictionary.date_error+ currentDate.getDate() +"/"+  (currentDate.getMonth() + 1) + "/" + currentDate.getFullYear() + "onwards";
+    }
+
+    return null;
+}
+
 export const validatePriority = (priority, dictionary) =>{
 
     if(isEmpty(priority)){
@@ -111,3 +124,31 @@ export const validateSubject = (name, dictionary) =>{
 
     return null;
 }
+
+export const validateTimes = (startTime, endTime, dictionary) =>{
+
+    if (!startTime || !endTime) return null;
+
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
+    const startMinutes = start.getHours() * 60 + start.getMinutes();
+    const endMinutes = end.getHours() * 60 + end.getMinutes();
+
+    if (startMinutes >= endMinutes) {
+
+        return dictionary.times_conflicting_error;
+    }
+
+    return null;
+}
+
+export const validateColor = (color, dictionary) =>{
+
+    if(isEmpty(color)){
+        return dictionary.color_empty_error;
+    }
+
+    return null;
+}
+

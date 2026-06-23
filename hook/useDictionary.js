@@ -4,7 +4,7 @@ import { getTranslations, buildDictionary } from "../util/translation";
 
 export default function useDictionary(){
     const [dictionary, setDictionary] = useState({});
-    const [lang, setLang] = useState('');
+    const [lang, setLang] = useState('en');
 
     
     useEffect(()=>{

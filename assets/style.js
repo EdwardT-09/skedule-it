@@ -174,13 +174,14 @@ const styles= StyleSheet.create({
     //navigation
 
     nav:{
-        margin:'5%',
-        position:'relative',
+        marginHorizontal:'10%',
+        position:'absolute',
+        bottom:25,
+        width:'80%',
     },
 
     navContainer:{
-        position:'absolute',
-        bottom:25,
+
         width:'100%',
         backgroundColor:'#1e1e1e',
         paddingVertical:10,
@@ -357,6 +358,8 @@ const styles= StyleSheet.create({
     modalMenuImage:{
         marginVertical:'5%',
         marginRight:'5%',
+        width:36,
+        height:36,
     },
 
     modalMenuLabels:{

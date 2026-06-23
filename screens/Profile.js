@@ -70,12 +70,24 @@ export default function Profile({navigation}){
         }
 
     }
+
+    const logOut = async() =>{
+        const user = (await supabase.auth.getUser()).data.user;
+
+        if(!user) return;
+
+        const {error} = await supabase.auth.signOut();
+
+        if(!error){
+            navigation.navigate("Landing");
+        }
+    }
     return(
         <View style={{flex:1,}}>
             <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
                 <ScrollView>
                     <View style={{flex:0, justifyContent:'center', alignItems:'center', paddingBottom:'40%'}}>
-                        <Header></Header>
+                        <Header/>
                         <Text style={styles.profileText}>{dictionary.my_profile}</Text> 
                         <Image source={genderImage[gender]} style={{width:200, height:200, resizeMode:'contain', marginTop:'5%',}}></Image>
                         <View style={{flex:0, flexDirection:'row', alignItems:'center'}}>
@@ -121,12 +133,12 @@ export default function Profile({navigation}){
                                     <Image source={require('../assets/Caret Right.png')}></Image>
                                 </View>
                             </Pressable>
-                            <View style={{paddingLeft:'3%', paddingVertical:'4%', flex:0, justifyContent:'center', alignItems:'center'}}>
+                            <Pressable style={{paddingLeft:'3%', paddingVertical:'4%', flex:0, justifyContent:'center', alignItems:'center'}} onPress={() => {logOut()}}>
                                 <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
                                     <Image source={require('../assets/Log out.png')}></Image>
                                     <Text style={[styles.settingsText,{color:'#c14343'}]}>{dictionary.logout}</Text>
                                 </View>
-                            </View>
+                            </Pressable>
                         </View>
                     </View>
                 </ScrollView>
