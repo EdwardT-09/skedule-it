@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView} from "react-native";
+import React, { useState, useEffect } from 'react';
+import { View, Text, Button, ImageBackground, Image, TextInput, Platform, Pressable,ScrollView, ActivityIndicator} from "react-native";
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -20,12 +20,12 @@ export default function SignIn({navigation}) {
 
     const [showPassword, setShowPassword] = useState(true);
 
-    const [loading,setLoading] = useState('');
+    const [signInLoading,setSignInLoading] = useState('');
 
-    const dictionary = useDictionary();
+    const {dictionary, loading} = useDictionary();
 
     const handleSignIn = async () => {
-        if(loading) return;
+        if(signInLoading) return;
 
         const emailErr = validateEmail(email, dictionary);
         const passwordErr = validatePassword(password, dictionary);
@@ -34,25 +34,39 @@ export default function SignIn({navigation}) {
         setPasswordError(passwordErr);
 
         if(emailErr === null && passwordErr===null){
-            setLoading(true);
+            setSignInLoading(true);
             try{
-            const error = await onSignIn(email, password);
+            const emailTrim = email.trim();
+            const error = await onSignIn(emailTrim, password);
             if(error === null){
-            console.log('Hello');
            return navigation.navigate('Home');
         } else{
-            console.log('Failed');
+            setGeneralError(error)
         }
         } catch(e){
-            setGeneralError(error);}
+            setGeneralError(e);}
             finally{
-                setLoading(false);
+                setSignInLoading(false);
             }
 
 
         }
         return false;
 
+    }
+
+
+    if(loading){
+        return(
+            <View style={{flex:1}}>
+            <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
+                <Header></Header>
+            <View style={{flex: 1, justifyContent:"center", alignItems:"center"}}>
+                <ActivityIndicator size="large" color="black"></ActivityIndicator>
+            </View>
+            </LinearGradient>
+            </View>
+        )
     }
     return (
         <ScrollView>
@@ -72,12 +86,12 @@ export default function SignIn({navigation}) {
                                 <SafeAreaView style={{paddingHorizontal: 15}}>
                                     <View style={styles.fields}>
                                         <Text style={styles.fieldLabels}>{dictionary.email}:</Text>
-                                        <TextInput style ={styles.input} value = {email} onChangeText={setEmail} placeholder={dictionary.email_placeholder}></TextInput>
+                                        <TextInput style ={styles.input} value = {email} onChangeText={setEmail} placeholder={dictionary.email_placeholder} placeholderTextColor='#555555'></TextInput>
                                         {emailError? (<Text style={styles.errorText}>{emailError}</Text>) : null}
                                     </View>
                                     <View style={styles.fields}>
                                         <Text style={styles.fieldLabels}>{dictionary.password}:</Text>
-                                        <TextInput style ={styles.input} secureTextEntry={showPassword} value={password} onChangeText={setPassword} placeholder={dictionary.password_placeholder}></TextInput>
+                                        <TextInput style ={styles.input} secureTextEntry={showPassword} value={password} onChangeText={setPassword} placeholder={dictionary.password_placeholder} placeholderTextColor='#555555'></TextInput>
                                         <Pressable onPress={()=> setShowPassword(!showPassword)}>
                                             <Text style={styles.visiblePassword}>{showPassword ? dictionary.show : dictionary.hide} {dictionary.password}</Text>
                                         </Pressable>
@@ -97,7 +111,7 @@ export default function SignIn({navigation}) {
                                                 <Text style={styles.links}>{dictionary.register}</Text>
                                             </Pressable>
                                         </View>
-                                        <Pressable onPress={()=> navigation.navigate('Register')} style={{paddingVertical:'5%', }}>
+                                        <Pressable onPress={()=> navigation.navigate('ForgotPassword')} style={{paddingVertical:'5%', }}>
                                             <Text style={styles.links}>{dictionary.forgot_password}</Text>
                                         </Pressable>
                                     </View>

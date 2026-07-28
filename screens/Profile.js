@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView, Switch} from "react-native";
+import { View, Text, Button, ImageBackground, Image, Pressable,ScrollView, Switch, ActivityIndicator} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 
 import useDictionary from '../hook/useDictionary.js';
@@ -7,6 +7,7 @@ import {supabase} from '../config/initSupabase.js';
 import Header from '../components/Header.js';
 import Navigation from '../components/Nav.js';
 import styles from '../assets/style.js';
+import { isNotLoggedIn } from '../util/common.js';
 
 export default function Profile({navigation}){
     const [isEnabled, setIsEnabled] = useState(false);
@@ -19,9 +20,10 @@ export default function Profile({navigation}){
    
     useEffect(()=>{
             fetchData();
+            isNotLoggedIn(navigation);
     },[])
 
-    const dictionary = useDictionary();
+    const {dictionary, loading} = useDictionary();
 
     const saveNotification = async() => {
         const toggle = !isEnabled;
@@ -29,7 +31,6 @@ export default function Profile({navigation}){
         
         const user = (await supabase.auth.getUser()).data.user;
 
-        if (!user) console.log('No User 1');
 
         const {data, error} = await supabase
             .from('profiles')
@@ -38,11 +39,6 @@ export default function Profile({navigation}){
                 notification: toggle,
             })
 
-            if(error){
-                console.log(error);
-            }
-
-            console.log('saved');
     }
 
     const fetchData = async() => {
@@ -50,7 +46,6 @@ export default function Profile({navigation}){
 
         const user = (await supabase.auth.getUser()).data.user;
 
-        if (!user) console.log('No User 2');
 
         const {data, error} = await supabase
             .from('profiles')
@@ -58,16 +53,14 @@ export default function Profile({navigation}){
             .eq('id', user.id)
             .single();
 
-        console.log(data.notification);
+
         if(data){
             setUsername(data.username);
             setIsEnabled(data.notification);
             setGender(data.gender);
         }
 
-        if(error){
-            console.log('Error: Notification Fetching');
-        }
+
 
     }
 
@@ -82,19 +75,35 @@ export default function Profile({navigation}){
             navigation.navigate("Landing");
         }
     }
+
+    if(loading){
+        return(
+            <View style={{flex:1}}>
+            <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
+                <Header></Header>
+            <View style={{flex: 1, justifyContent:"center", alignItems:"center"}}>
+                <ActivityIndicator size="large" color="black"></ActivityIndicator>
+            </View>
+            </LinearGradient>
+            </View>
+        )
+    }
+
     return(
         <View style={{flex:1,}}>
             <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
                 <ScrollView>
                     <View style={{flex:0, justifyContent:'center', alignItems:'center', paddingBottom:'40%'}}>
                         <Header/>
-                        <Text style={styles.profileText}>{dictionary.my_profile}</Text> 
-                        <Image source={genderImage[gender]} style={{width:200, height:200, resizeMode:'contain', marginTop:'5%',}}></Image>
-                        <View style={{flex:0, flexDirection:'row', alignItems:'center'}}>
-                            <Text style={styles.profileName}>{username}</Text>
-                            <Pressable onPress={()=> navigation.navigate('ChangeInfo')} style={({pressed}) => [{opacity: pressed? 0.5 : 1, paddingLeft:'5%'}]}>
-                                <Image source={require('../assets/Edit.png')} style={{width:25, height:25,}}></Image>
+                        <Text style={styles.profileText}>{dictionary.profile}</Text> 
+                        <View style={{width:'100%',  alignItems:'flex-end', paddingRight:'15%'}}>
+                            <Pressable onPress={()=> navigation.navigate('ChangeInfo')} style={({pressed}) => [{opacity: pressed? 0.5 : 1, paddingLeft:'5%',}]}>
+                                <Image source={require('../assets/Edit.png')} style={{width:30, height:30,}}></Image>
                             </Pressable>
+                        </View>
+                        <View style={{flex:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+                            <Image source={genderImage[gender]} style={{width:200, height:200, resizeMode:'contain', marginTop:'5%',}}></Image>
+                            <Text style={styles.profileName}>{username}</Text>
                         </View>
                         <Text style={styles.profileGender}>{gender}</Text>
                         <View style={[styles.container, {marginTop:'10%'}]}>

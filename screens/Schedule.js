@@ -1,5 +1,5 @@
 import React, {use, useState, useEffect} from 'react';
-import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView} from "react-native";
+import { View, Text, Button, ImageBackground, Image, Pressable,ScrollView, ActivityIndicator} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 
 import Modal from 'react-native-modal';
@@ -9,14 +9,17 @@ import Header from '../components/Header.js';
 import Navigation from '../components/Nav.js';
 import styles from '../assets/style.js';
 import AddSchedule from './AddSchedule.js';
+import { isNotLoggedIn } from '../util/common.js';
+import * as FileSystem from "expo-file-system/legacy";
+import * as Sharing from "expo-sharing";
+import { generateICS } from '../util/ics.js';
+
 
 export default function Schedule({navigation}){
-    const dictionary = useDictionary();
+    const {dictionary, loading} = useDictionary();
 
     //useState for showing the modal for each event schedule
     const [eventMenuVisible, setEventMenuVisible] = useState(false);
-
-    const [addMenuVisible, setAddMenuVisible] = useState(false);
 
     // anchor to hold as the reference monday for this week
     const [mondayAnchor, setMondayAnchor] = useState(getMonday(new Date()));
@@ -37,6 +40,11 @@ export default function Schedule({navigation}){
 
     const COLUMN_WIDTH = 130;
     const TIME_COL_WIDTH = 60;
+
+    //if user not logged in, then navigate to landing page
+    useEffect(()=>{
+            isNotLoggedIn(navigation)
+        },[])
 
     //to extract the monday date of any given week based on the date provided
     function getMonday(d){
@@ -62,7 +70,7 @@ export default function Schedule({navigation}){
                 name:currentDay.toLocaleDateString('en-US', {weekday: 'short'}).toLowerCase(),
                 number:currentDay.getDate(),
                 month: currentDay.getMonth() + 1,
-                isoString:currentDay.toISOString().split('T')[0]
+                isoString:`${currentDay.getFullYear()}-${String(currentDay.getMonth()+1).padStart(2,'0')}-${String(currentDay.getDate()).padStart(2,'0')}`
             });
 
         }
@@ -101,45 +109,86 @@ export default function Schedule({navigation}){
     }
 
 
+    const exportToICS = async(events) =>{
+        try{
+            const icsString = generateICS(events);
+
+            const fileUri = FileSystem.documentDirectory + "schedule.ics";
+
+            await FileSystem.writeAsStringAsync(fileUri, icsString, {
+                encoding: FileSystem.EncodingType.UTF8,
+            })
+
+            await Sharing.shareAsync(fileUri)
+        } catch (err){
+            return;
+        }
+    }
+
+    const fetchUserSchedule = async() => {
+        const user = (await supabase.auth.getUser()).data.user;
+
+        if(!user) return;
+
+        const {data,error} = await supabase
+            .from("schedule_events")
+            .select(`title, start_date, end_date, start_time, end_time, recurring`)
+            .eq('user_id', user?.id)
+        
+        if(!error && data){
+            await exportToICS(data);
+        } else{
+            Alert.alert(dictionary.error, error.message);
+        }
+
+        
+    }
+
+
 
    //get data from database
    const fetchScheduleForTheWeek = async(currentWeekDays) => {
-    if(currentWeekDays.length === 0) return;
+        const user = (await supabase.auth.getUser()).data.user;
 
-    const startRange = currentWeekDays[0].isoString;
-    const endRange = currentWeekDays[currentWeekDays.length - 1].isoString;
+        if(!user) return;
+        
+        if(currentWeekDays.length === 0) return;
 
-    const {data, error} = await supabase
-    .from('schedule_events')
-    .select('*')
-    .gte('end_date', startRange)
-    .lte('start_date', endRange);
-    
-    if(!error && data){
-        setEvents(data);
-    }
+        const startRange = currentWeekDays[0].isoString;
+        const endRange = currentWeekDays[currentWeekDays.length - 1].isoString;
+
+        const {data, error} = await supabase
+        .from('schedule_events')
+        .select('*')
+        .gte('end_date', startRange)
+        .lte('start_date', endRange)
+        .eq('user_id', user?.id)
+
+        if(!error && data){
+            setEvents(data);
+        }
    }
 
    const dayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-   const eventOccurence = (event, dayObj) =>{
-        const start = new Date(event.start_date);
-        const end = new Date (event.end_date);
+    const eventOccurence = (event, dayObj) => {
+        const currentDate = dayObj.isoString;
 
-        const current = new Date(dayObj.isoString);
-
-        //if the event is outside the range, then it will not be displayed
-        if(current< start || current > end) return false;
-
-        //if it is a non-recurring event, it will only show on start date 
-        if(!event.recurring || event.recurring.length === 0){
-            return current.toISOString().split("T")[0] === event.start_date;
+        // non recurring event
+        if (!event.recurring || event.recurring.length === 0) {
+            return currentDate === event.start_date;
         }
 
-        //recurring event will show only on its corresponding day
+        // recurring event
+        if(currentDate < event.start_date || currentDate > event.end_date){
+            return false;
+        }
+
+        const current = new Date(currentDate);
         const weekday = dayName[current.getDay()];
+
         return event.recurring.includes(weekday);
-   }
+    };
 
    const renderGridCell = (hour, dayObj) =>{
     const cellEvent = events.find(event =>{
@@ -155,20 +204,27 @@ export default function Schedule({navigation}){
 
 
     
+    if(loading){
+        return(
 
+            <View style={{flex: 1, justifyContent:"center", alignItems:"center"}}>
+                <ActivityIndicator size="large" color="black"></ActivityIndicator>
+            </View>
+
+        )
+    }
 
     return (
-        <View key ={dayObj.isoString} style={{ width:COLUMN_WIDTH, minHeight:100, padding:4}}>
+        <View>
             {cellEvent && (
                 <View style={{backgroundColor: cellEvent.color || '#FF6B6B',
-                        flex: 1,
                         borderRadius: 8,
                         borderWidth: 2,
                         borderColor: '#000',
                         padding: 6,
                         }}>
-                    <View style={{flex:0, justifyContent:'space-between', flexDirection:'row'}}>
-                        <Text style={{fontSize: 16, fontWeight: '900', color:'#000'}}>{cellEvent.title}</Text>
+                    <View style={{flex:0, justifyContent:'space-between', flexDirection:'row', width:'85%'}}>
+                        <Text style={{fontSize: 15, fontWeight: '900', color:'#000'}}>{cellEvent.title}</Text>
                         <Pressable  onPress={() => {setEventMenuVisible(true); setSelectedEvent(cellEvent.id);}}>
                             <Image source={require('../assets/Menu.png')} style={{width:20, height:20}}/>
                         </Pressable>
@@ -190,13 +246,18 @@ export default function Schedule({navigation}){
                         <View style={[styles.titleContainer,]}>
                             <View style={{paddingHorizontal: '5%'}}>
                                 <Text style={styles.subtitle}>{dictionary.lets_go}</Text>
-                                <View style={{flex:0, flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
+                                <View style={{flex:0, flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginBottom:'5%'}}>
                                     <Text style={styles.title}>
                                         {dictionary.schedule}
                                     </Text>
-                                    <Pressable onPress={()=>{setAddMenuVisible(true)}}>
-                                        <Image source={require('../assets/Plus.png')}/>
-                                    </Pressable>
+                                    <View style={{flex:0, flexDirection:'row', gap:12}}>
+                                        <Pressable onPress={fetchUserSchedule}>
+                                            <Image source={require('../assets/Download.png')}/>
+                                        </Pressable>
+                                        <Pressable onPress={()=>{navigation.navigate('AddSchedule')}}>
+                                            <Image source={require('../assets/Plus.png')}/>
+                                        </Pressable>
+                                    </View>
                                 </View>
                                 <View style={{flex:0, flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
                                     <Pressable onPress={handlePrevWeek} style={{borderWidth:2, borderColor:'gray', padding:'2.5%'}}><Text style={{fontWeight:'900'}}>{"<"}</Text></Pressable>
@@ -207,7 +268,7 @@ export default function Schedule({navigation}){
                         
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
                             <View style={{flexDirection:'column'}}> 
-                                <View style={{ flexDirection: 'row', backgroundColor: '#FFB84D', borderWidth: 2, borderColor: '#000', borderRadius: 4, marginBottom: 5 }}>
+                                <View style={{ flexDirection: 'row',  backgroundColor: '#FFB84D', borderWidth: 2, borderColor: '#000', borderRadius: 4, marginBottom: 5 }}>
                                     <View style={{width:TIME_COL_WIDTH, borderRightWidth:2, borderColor:'#000'}}/>
                                         {weekDays.map(day => (
                                             <View key={day.isoString} style={{width:COLUMN_WIDTH, alignItems:'center', paddingVertical:4, borderRightWidth: day.name === 'sun' ? 0 : 1, borderColor: 'gray'}}>
@@ -224,7 +285,7 @@ export default function Schedule({navigation}){
                                             <View style={{width:TIME_COL_WIDTH, padding: 10, justifyContent:'center', alignItems:'center', borderRightWidth:2, borderColor:'gray'}}>
                                                 <Text style={{fontWeight:'900', fontSize:14}}>{hour}</Text>
                                             </View>
-                                            {weekDays.map(dayObj => renderGridCell(hour, dayObj))}
+                                            {weekDays.map(dayObj => <View key={`${hour} - ${dayObj.isoString}`} style={{ width:COLUMN_WIDTH, minHeight:100, padding:4,     overflow: 'hidden'}}>{renderGridCell(hour, dayObj)}</View>)}
                                         </View>
                                     ))}
                                 </ScrollView>
@@ -233,23 +294,6 @@ export default function Schedule({navigation}){
                         </ScrollView>
                     </View>
                     <Navigation/>
-                    <Modal style={{justifyContent: 'flex-end', margin:0}} transparent={true} isVisible={addMenuVisible} swipeDirection="down" onSwipeComplete={()=> setAddMenuVisible(false)} onBackdropPress={()=> setAddMenuVisible(false)} propagateSwipe={true}>
-                        <View style={[styles.modalMenuContainer]}>
-                            <Pressable onPress={()=>{setAddMenuVisible(false)}}>
-                                <Image source={require('../assets/close.png')} style={{ flex:0, justifyContent:'center', alignSelf:'flex-end'}}></Image>
-                            </Pressable>
-                            <View>
-                                <Pressable onPress = {()=> {navigation.navigate('AddSchedule'); setAddMenuVisible(false)}} style={({pressed})=> ([styles.modalMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
-                                    <Image source={require('../assets/Edit.png')} style={styles.modalMenuImage}></Image>
-                                    <Text style={styles.taskMenuLabels}>{dictionary.add}</Text>
-                                </Pressable>
-                                <Pressable onPress= {()=> {uploadDocument() ;setAddMenuVisible(false)}} style={({pressed})=> ([styles.modalMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
-                                    <Image source={require('../assets/Camera.png')} style={styles.modalMenuImage}></Image>
-                                    <Text style={[styles.taskMenuLabels, {color:'black'}]}>{dictionary.upload_file}</Text>
-                                </Pressable>
-                            </View>
-                        </View>
-                    </Modal>
                     <Modal style={{justifyContent: 'flex-end', margin:0}} transparent={true} isVisible={eventMenuVisible} swipeDirection="down" onSwipeComplete={()=> setEventMenuVisible(false)} onBackdropPress={()=> setEventMenuVisible(false)} propagateSwipe={true}>
                         <View style={[styles.modalMenuContainer]}>
                             <Pressable onPress={()=>{setEventMenuVisible(false)}}>

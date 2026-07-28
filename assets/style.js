@@ -2,6 +2,37 @@ import { StyleSheet } from "react-native";
 
 
 const styles= StyleSheet.create({
+    offlineOverlay: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 999,
+    },
+
+    offlinePopup: {
+        backgroundColor: "#D32F2F",
+        paddingVertical: 20,
+        paddingHorizontal: 30,
+        borderRadius: 12,
+        elevation: 5, // Android shadow
+        shadowColor: "#000",
+        shadowOffset: {
+        width: 0,
+        height: 3,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 5,
+    },
+
+    offlineText: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
 
     links:{
         color:'black',
@@ -32,8 +63,21 @@ const styles= StyleSheet.create({
 
     },
 
-    trueCenter:{
+    nilContainer:{
         flex:1,
+        alignItems:'center', 
+        justifyContent:'center', 
+        marginTop:'5%'},
+
+    nilError:{
+        width:"80%",
+        color:'gray',
+        fontFamily:  'Poppins_400Regular',
+        textAlign:"center",
+    },
+
+    trueCenter:{
+        flex:0,
         alignItems:'center',
         justifyContent:'center',
     },
@@ -217,14 +261,40 @@ const styles= StyleSheet.create({
         shadowColor: '#ffcd07',
     },
 
+
+    emailConfirmationText:{
+        fontSize:16,
+        margin:'3%',
+        marginLeft:0,
+    },
+
+    dueTodayText:{
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10 
+    },
+
+
+    chart: {
+        borderRadius: 16,
+        padding: 16,
+    },
+
+    chartTitle: {
+        fontSize: 18,
+        fontWeight: "600",
+        marginBottom: 12,
+    },
+
     //subject
     subjectContainer:{
-        flex:0,
-        flexDirection:'row', 
-        paddingHorizontal:'5%', 
-        justifyContent:'space-between',
+        flexDirection:'row',
         flexWrap:'wrap',
-        paddingVertical:'5%',
+        justifyContent:'center',
+        alignItems:'center',
+        paddingHorizontal:10,
+        paddingVertical:20,
+        paddingBottom:50,
     },
 
     subjectItems:{

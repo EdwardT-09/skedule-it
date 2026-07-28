@@ -3,7 +3,9 @@ import {isEmpty} from './common.js';
 import useDictionary from '../hook/useDictionary.js';
 
 export const validateUsername = (username, dictionary) => {
-    if (isEmpty(username)){
+    const usernameTrim = username.trim();
+
+    if (isEmpty(usernameTrim)){
         return dictionary.username_empty_error;
     } 
 
@@ -13,11 +15,12 @@ export const validateUsername = (username, dictionary) => {
 export const validateEmail = (email, dictionary) => {
 
     const pattern = /^[\w\-\.]+@([\w-]+\.)+[\w-]{2,}$/;
-    if (isEmpty(email)){
+    const emailTrim = email.trim();
+    if (isEmpty(emailTrim)){
         return dictionary.email_empty_error;
     } 
 
-    if(!pattern.test(email)){
+    if(!pattern.test(emailTrim)){
         return dictionary.email_format_error;
     }
 
@@ -37,7 +40,7 @@ export const validateGender = (gender, dictionary) => {
 
 export const validatePassword = (password, dictionary) => {
 
-    const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[%&?_#=-])[A-Za-z\d%&?_#=-]{8,}$/;
+    const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=[\]{};':"\\|,.<>/?-])[A-Za-z\d!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]{8,}$/;
     if (isEmpty(password)){
         return dictionary.password_empty_error;
     } 
@@ -50,7 +53,7 @@ export const validatePassword = (password, dictionary) => {
 
 export const validatePassword2 = (password, password2, dictionary) => {
 
-    const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[%&?_#=-])[A-Za-z\d%&?_#=-]{8,}$/;
+    const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=[\]{};':"\\|,.<>/?-])[A-Za-z\d!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]{8,}$/;
     if (isEmpty(password2)){
         return dictionary.confirm_password_empty_error;
     }
@@ -65,8 +68,8 @@ export const validatePassword2 = (password, password2, dictionary) => {
 };
 
 export const validateTitle = (title, dictionary) =>{
-
-    if(isEmpty(title)){
+    const titleTrim = title.trim();
+    if(isEmpty(titleTrim)){
         return dictionary.title_empty_error;
     }
 
@@ -91,8 +94,6 @@ export const validateDateTime = (date, dictionary) =>{
 
     const currentDate = new Date();
     
-    console.log("selected:", date);
-    console.log("current:", currentDate);
     if(date < currentDate){
         return dictionary.date_error+ currentDate.getDate() +"/"+  (currentDate.getMonth() + 1) + "/" + currentDate.getFullYear() + "onwards";
     }
@@ -109,7 +110,8 @@ export const validatePriority = (priority, dictionary) =>{
 }
 
 export const validateSubjectCode = (subjectCode, dictionary) =>{
-    if(isEmpty(subjectCode)){
+    const subjectcodeTrim = subjectCode.trim();
+    if(isEmpty(subjectcodeTrim)){
         return dictionary.subjectCode_empty_error;
     }
 
@@ -117,7 +119,6 @@ export const validateSubjectCode = (subjectCode, dictionary) =>{
 }
 
 export const validateSubject = (name, dictionary) =>{
-
     if(isEmpty(name)){
         return dictionary.subject_empty_error;
     }
@@ -151,4 +152,26 @@ export const validateColor = (color, dictionary) =>{
 
     return null;
 }
+
+export const validateDuration = (duration, dictionary) =>{
+    const durationTrim = duration.trim();
+
+    if(isEmpty(durationTrim)){
+        return dictionary.duration_empty_error;
+    }
+
+    return null;
+}
+
+export const validateConfidence = (confidence, dictionary) =>{
+
+    if(isEmpty(confidence)){
+        return dictionary.confidence_empty_error;
+    }
+
+    return null;
+}
+
+
+
 

@@ -9,23 +9,17 @@ import {validatePassword, validatePassword2 } from '../util/validation.js';
 import Header from '../components/Header.js';
 import Navigation from '../components/Nav.js';
 import styles from '../assets/style.js';
-import { isNotLoggedIn } from '../util/common.js';
+
 
 export default function Password({navigation}){
-    const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    const [currentPasswordError, setCurrentPasswordError] = useState('');
     const [newPasswordError, setNewPasswordError] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
     const {dictionary, loading} = useDictionary();
 
-    //if user not logged in, then navigate to landing page
-    useEffect(()=>{
-            isNotLoggedIn(navigation)
-        },[])
 
     const changePassword = async() => {
                 
@@ -33,31 +27,24 @@ export default function Password({navigation}){
 
         if(!user) return;
 
-        const currentPasswordErr =  validatePassword(currentPassword, dictionary);
+
         const newPasswordErr =  validatePassword(newPassword, dictionary);
         const confirmPasswordErr =  validatePassword2(newPassword, confirmPassword, dictionary);
 
-        setCurrentPasswordError(currentPasswordErr);
+
         setNewPasswordError(newPasswordErr);
         setConfirmPasswordError(confirmPasswordErr);
 
+        if(newPasswordErr === null && confirmPasswordErr === null){
+              
+            const {error} = await supabase.auth.updateUser({
+                password : confirmPassword
+            })
 
-        if(currentPasswordErr === null && newPasswordErr === null && confirmPasswordErr === null){
-
-        const {data, error} = await supabase.auth.signInWithPassword({
-            email: user.email,
-            password: currentPassword,
-        })
-
-            if(data){
-
-                    const {data, error} = await supabase.auth.updateUser({
-                        password : confirmPassword
-                    })
-
-                } else {
-                    setCurrentPasswordError('The current password provided is incorrect.', error);
-                }
+            if(!error){
+                Alert.alert(dictionary.password_changed);
+            }
+               
         }
         
     }
@@ -90,11 +77,6 @@ export default function Password({navigation}){
                                 </View>
                             </View>
                                 <SafeAreaView style={{paddingHorizontal: 15}}>
-                                    <View style={styles.fields}>
-                                        <Text style={styles.fieldLabels}>{dictionary.current_password}: </Text>
-                                        <TextInput style={styles.input} secureTextEntry={true} value={currentPassword} onChangeText={setCurrentPassword} placeholder={dictionary.current_password_placeholder} placeholderTextColor='#555555'></TextInput>
-                                        {currentPasswordError? (<Text style={styles.errorText}>{currentPasswordError}</Text>) : null}
-                                    </View>
                                     <View style={styles.fields}>
                                         <Text style={styles.fieldLabels}>{dictionary.new_password}: </Text>
                                         <TextInput style={styles.input} secureTextEntry={true} value={newPassword} onChangeText={setNewPassword} placeholder={dictionary.new_password} placeholderTextColor='#555555'></TextInput>

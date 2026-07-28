@@ -5,7 +5,7 @@ import { getTranslations, buildDictionary } from "../util/translation";
 export default function useDictionary(){
     const [dictionary, setDictionary] = useState({});
     const [lang, setLang] = useState('en');
-
+    const [loading, setLoading] = useState(true);
     
     useEffect(()=>{
         getLang();
@@ -15,10 +15,13 @@ export default function useDictionary(){
         const loadDictionary = async() =>{
             if (!lang) return;
 
+            setLoading(true);
+
             const rows = await getTranslations(lang)
             const dict = buildDictionary(rows, lang);
 
             setDictionary(dict);
+            setLoading(false);
         };
         loadDictionary();
     }, [lang])
@@ -26,7 +29,7 @@ export default function useDictionary(){
     const getLang = async() =>{
         const user = (await supabase.auth.getUser()).data.user;
 
-        if(!user) return;
+        if(!user) {setLoading(false); return};
 
         const {data, error} = await supabase
         .from('profiles')
@@ -39,5 +42,5 @@ export default function useDictionary(){
         }
     }
 
-    return dictionary;
+    return {dictionary, loading,  refreshDictionary: getLang};
 }

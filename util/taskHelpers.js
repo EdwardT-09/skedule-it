@@ -19,58 +19,54 @@
     
 
     export const organizeTasks = (tasks) =>{
-        //store main tasks in parent var
-        const parents = tasks.filter(task => !task.parent_key);
+       const organized = [];
 
-        //sort parents by priority
-        parents.sort(
-                (a,b) =>
-                    //when it is negative, a will come first
-                    //when it is positive, b will come first
-                    //if its equal, it will keep the same order
-                    priorities.indexOf(a.priority) - priorities.indexOf(b.priority)
-        )
+       const addTaskWithChildren = (task, level = 0) =>{
+        organized.push({
+            ...task,
+            displayLevel: level
+        });
 
-        //add the subtasks
-        const organized = []
+        const children = tasks.filter(
+            child => child.parent_key === task.id
+        );
 
-        parents.forEach(parent => {
-            // add the parent into the organized array
-            organized.push(parent);
+        children.sort(
+            (a,b) => priorities.indexOf(a.priority) - priorities.indexOf(b.priority)
+        );
 
-            //get the subtask 
-            const subtasks = tasks.filter(task => task.parent_key === parent.id);
+        children.forEach(child =>{
+            addTaskWithChildren(child, level+1)
+        });
+    }
 
-            subtasks.sort(
-                (a,b) => 
-                    //when it is negative, a will come first
-                    //when it is positive, b will come first
-                    //if its equal, it will keep the same order
-                    priorities.indexOf(a.priority) - priorities.indexOf(b.priority)  
-            );
-            organized.push(...subtasks);
-            subtasks.forEach(subtask =>{
-                //get the sub-subtask 
-                const childSubtasks = tasks.filter(task => task.parent_key === subtask.id);
-                childSubtasks.sort((a,b) => 
-                    //when it is negative, a will come first
-                    //when it is positive, b will come first
-                    //if its equal, it will keep the same order
-                    priorities.indexOf(a.priority) - priorities.indexOf(b.priority)  
-                );
-            organized.push(...childSubtasks);
-            })
-          
-        })
-        return organized;
+        const rootTasks = tasks.filter(task => !task.parent_key);
+
+
+        rootTasks.sort(
+            (a,b) => priorities.indexOf(a.priority) - priorities.indexOf(b.priority)
+        );
+
+        rootTasks.forEach(task =>{
+            addTaskWithChildren(task);
+        });
+        
+       return organized;
     } 
 
     export const isTodayTask = (task) =>{
         const currentDateStr = getCurrentDateStr();
         const todayName = getTodayName();
-        const oneTimeTask = task.date === currentDateStr;
 
-        const recurringTask = task.recurring?.includes(todayName) && Array.isArray(task.recurring) && task.date <= currentDateStr;
+        if(
+            task.has_deadline && task.end_date && task.end_date < currentDateStr
+
+        ){
+            return false;
+        }
+        const oneTimeTask = task.start_date === currentDateStr;
+
+        const recurringTask = task.recurring?.includes(todayName) && Array.isArray(task.recurring) && task.start_date <= currentDateStr;
 
         return oneTimeTask || recurringTask
     }

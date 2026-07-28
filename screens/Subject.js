@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView, Switch} from "react-native";
+import { View, Text, Button, ImageBackground, Image,  Pressable,ScrollView, Switch, ActivityIndicator} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import Modal from 'react-native-modal'
 import * as DocumentPicker from 'expo-document-picker';
@@ -7,7 +7,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import { File } from 'expo-file-system/next';
 import { decode } from 'base64-arraybuffer';
 import { ai } from '../config/initGemini.js'
-import { roundUpToDecimal } from '../util/common.js';
+import { isNotLoggedIn, roundUpToDecimal } from '../util/common.js';
 import useDictionary from '../hook/useDictionary.js';
 import {supabase} from '../config/initSupabase.js';
 import Header from '../components/Header.js';
@@ -23,12 +23,31 @@ export default function Subject ({navigation, route}){
 
     const [files, setFiles] = useState([]);
 
-    const dictionary = useDictionary();
+    const {dictionary, loading} = useDictionary();
 
     const subjectID = route?.params?.subjectID;
 
-    useEffect(() => {getSubject(); getFiles();}, []);
+    useEffect(() => {getSubject(); getFiles();isNotLoggedIn(navigation)}, []);
     
+    const deleteSubject = async(selectedSubject) =>{
+                const user = (await supabase.auth.getUser()).data.user;
+        
+                if(!user) return;
+        
+                const {error} = await supabase
+                .from('subjects')
+                .delete()
+                .eq('id', selectedSubject)
+        
+                if(error){
+                    console.log(error);
+                } else{ 
+                    getSubject();
+                    setMenuVisible(false);
+                    navigation.navigate('Subjects')
+                }
+            }
+
     const getSubject = async() => {
         const user = (await supabase.auth.getUser()).data.user;
 
@@ -67,7 +86,6 @@ export default function Subject ({navigation, route}){
 
     const uploadToDatabase = async (file) => {
     try {
-      console.log(" ENTER uploadToDatabase");
 
       const user = (await supabase.auth.getUser()).data.user;
 
@@ -83,23 +101,14 @@ export default function Subject ({navigation, route}){
         });
 
       if (uploadError) {
-        console.log("UPLOAD ERROR:", uploadError);
         return;
       }
 
-      console.log(" FILE UPLOADED");
-
-
-      console.log(" BASE64 START");
 
       const base64 = await FileSystem.readAsStringAsync(file.uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
-      console.log(" BASE64 DONE:", base64.length);
-
-  
-      console.log(" GEMINI CALL START");
 
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
@@ -141,13 +150,11 @@ Output ONLY the Markdown notes.
         ],
       });
 
-      console.log("GEMINI DONE");
 
       const notes =
         response.text ||
         response.candidates?.[0]?.content?.parts?.[0]?.text;
 
-      console.log("NOTES:", notes?.slice(0, 200));
 
 
       const { error: dbError } = await supabase.from("notes").insert({
@@ -155,14 +162,9 @@ Output ONLY the Markdown notes.
         file_name: fileName,
         content: notes,
       });
-
-      if (dbError) {
-        console.log("🔥 DB ERROR:", dbError);
-      } else {
-        console.log("🔥 NOTES SAVED SUCCESSFULLY");
-      }
+    
     } catch (err) {
-      console.log("🔥 CRASH:", err);
+      return
     }
   };
 
@@ -190,23 +192,31 @@ Output ONLY the Markdown notes.
 
   async function testGemini() {
   try {
-    console.log("Testing Gemini...");
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: 'Say hello in one sentence.',
     });
 
-        console.log("RAW RESPONSE:", response);
-    console.log("TEXT:", response.text);
 
 
   } catch (error) {
-    console.error(error);
+    return;
   }
 }
 
 
-
+    if(loading){
+        return(
+            <View style={{flex:1}}>
+            <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
+                <Header></Header>
+            <View style={{flex: 1, justifyContent:"center", alignItems:"center"}}>
+                <ActivityIndicator size="large" color="black"></ActivityIndicator>
+            </View>
+            </LinearGradient>
+            </View>
+        )
+    }
 
     return(
        <View style={{flex:1,}}>
@@ -249,7 +259,7 @@ Output ONLY the Markdown notes.
                                 <Image source={require('../assets/Edit.png')} style={styles.modalMenuImage}></Image>
                                 <Text style={styles.modalMenuLabels}>{dictionary.edit}</Text>
                             </Pressable>
-                            <Pressable onPress= {()=> deleteTask(subjectID)} style={({pressed})=> ([styles.modalMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
+                            <Pressable onPress= {()=> deleteSubject(subjectID)} style={({pressed})=> ([styles.modalMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
                                 <Image source={require('../assets/Trash.png')} style={styles.modalMenuImage}></Image>
                                 <Text style={[styles.modalMenuLabels, {color:'#c14343'}]}>{dictionary.delete}</Text>
                             </Pressable>

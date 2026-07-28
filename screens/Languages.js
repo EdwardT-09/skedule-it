@@ -1,5 +1,5 @@
-import React, {use, useState} from 'react';
-import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView} from "react-native";
+import React, {use, useState, useEffect} from 'react';
+import { View, Text, Button, ImageBackground, Image, Pressable,ScrollView, ActivityIndicator} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 
 import useDictionary from '../hook/useDictionary.js';
@@ -7,10 +7,16 @@ import {supabase} from '../config/initSupabase.js';
 import Header from '../components/Header.js';
 import Navigation from '../components/Nav.js';
 import styles from '../assets/style.js';
+import { isNotLoggedIn } from '../util/common.js';
 
 export default function Languages({navigation}){
-    const dictionary = useDictionary();
+    const {dictionary, loading, refreshDictionary} = useDictionary();
     const [isLanguage, setIsLanguage] = useState('en');
+    
+    //if user not logged in, then navigate to landing page
+    useEffect(()=>{
+            isNotLoggedIn(navigation)
+        },[])
     const saveLanguage  = async(lang) => {
         const user = (await supabase.auth.getUser()).data.user;
     
@@ -23,7 +29,22 @@ export default function Languages({navigation}){
                 language: lang,
             })
         
-        const dictionary = useDictionary();
+
+        refreshDictionary();
+        navigation.navigate('Profile');
+    }
+
+    if(loading){
+        return(
+            <View style={{flex:1}}>
+            <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
+                <Header></Header>
+            <View style={{flex: 1, justifyContent:"center", alignItems:"center"}}>
+                <ActivityIndicator size="large" color="black"></ActivityIndicator>
+            </View>
+            </LinearGradient>
+            </View>
+        )
     }
     return(
     <View style={{flex:1}}>

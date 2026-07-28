@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, Modal, Pressable, StyleSheet, ImageBackground, Image, ScrollView, TextInput, Button} from 'react-native';
+import { View, Text, Modal, Pressable, StyleSheet, ImageBackground, Image, ScrollView, Platform, TextInput, Button} from 'react-native';
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import { isNotLoggedIn } from '../util/common.js';
 import useDictionary from '../hook/useDictionary.js'
 import {supabase} from '../config/initSupabase.js';
 import { validateSubjectCode, validateSubject} from '../util/validation.js';
@@ -19,9 +20,14 @@ export default function AddTask ({navigation, route}){
   
     const subjectID = route?.params?.subjectID;
 
-    const dictionary = useDictionary();
+    const {dictionary, loading} = useDictionary();
 
-    console.log(subjectID);
+    
+    //if user not logged in, then navigate to landing page
+    useEffect(()=>{
+            isNotLoggedIn(navigation)
+        },[])
+
      useEffect(()=> {
         if(subjectID){
             editSubject();
@@ -43,11 +49,7 @@ export default function AddTask ({navigation, route}){
             .eq('id', subjectID)
             .single()
 
-        console.log(data)
         
-        if(error){
-            console.log(error);
-        }
 
         setName(data.name);
         setSubjectCode(data.subject_code);
@@ -92,7 +94,6 @@ export default function AddTask ({navigation, route}){
 
         }
         else{
-            console.log('HIIII')
         const {error} = await supabase
         .from('subjects')
         .insert({
@@ -110,43 +111,45 @@ export default function AddTask ({navigation, route}){
         
     }
 
+    
+
     return(
         <View style={{flex:1,}}>
-            <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
-                <Header includeBack navigation={navigation}></Header>
-                <View style={{flex:0, alignItems:'center'}}>
-                <View style={[styles.container, ]}>
-                    <View style={[styles.titleContainer]}>
-                        <View style={{paddingHorizontal: '5%'}}>
-                            <Text style={styles.subtitle}>{dictionary.lets_go}</Text>
-                            <Text style={styles.title}>
-                                {dictionary.add_subject}
-                            </Text>
+                <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
+                    <Header includeBack navigation={navigation}></Header>
+                    <View style={{flex:0, alignItems:'center'}}>
+                    <View style={[styles.container, ]}>
+                        <View style={[styles.titleContainer]}>
+                            <View style={{paddingHorizontal: '5%'}}>
+                                <Text style={styles.subtitle}>{dictionary.lets_go}</Text>
+                                <Text style={styles.title}>
+                                    {dictionary.add_subject}
+                                </Text>
+                            </View>
+                        </View>
+                            <ScrollView style={{height:'65%'}}>
+                                <SafeAreaView style={{paddingHorizontal: 15}}>
+                                    <View style={styles.fields}>
+                                        <Text style={styles.fieldLabels}>{dictionary.subject_code}:</Text>
+                                        <TextInput style={styles.input} placeholder={dictionary.title_placeholder} value={subjectCode} onChangeText={setSubjectCode} placeholderTextColor='#555555'></TextInput>
+                                        {subjectCodeError ? (<Text style={styles.errorText}>{subjectCodeError}</Text>) : null}
+                                    </View>
+                                    <View style={styles.fields}>
+                                        <Text style={styles.fieldLabels}>{dictionary.subject}:</Text>
+                                        <TextInput style={styles.input} placeholder={dictionary.title_placeholder} value={name} onChangeText={setName} placeholderTextColor='#555555'></TextInput>
+                                        {nameError ? (<Text style={styles.errorText}>{nameError}</Text>) : null}
+                                    </View>                                
+                                    <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {opacity: pressed? 0.5 : 1, backgroundColor:'black'},]} onPress={validateFields}>
+                                                <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
+                                                    <Text style={[styles.buttonTexts, {color:'white'}]} >{dictionary.add}</Text>
+                                                </View>
+                                    </Pressable>
+                                </SafeAreaView>
+                            </ScrollView>
                         </View>
                     </View>
-                        <ScrollView style={{height:'65%'}}>
-                            <SafeAreaView style={{paddingHorizontal: 15}}>
-                                <View style={styles.fields}>
-                                    <Text style={styles.fieldLabels}>{dictionary.subject_code}:</Text>
-                                    <TextInput style={styles.input} placeholder={dictionary.title_placeholder} value={subjectCode} onChangeText={setSubjectCode}></TextInput>
-                                    {subjectCodeError ? (<Text style={styles.errorText}>{subjectCodeError}</Text>) : null}
-                                </View>
-                                <View style={styles.fields}>
-                                    <Text style={styles.fieldLabels}>{dictionary.subject}:</Text>
-                                    <TextInput style={styles.input} placeholder={dictionary.title_placeholder} value={name} onChangeText={setName}></TextInput>
-                                    {nameError ? (<Text style={styles.errorText}>{nameError}</Text>) : null}
-                                </View>                                
-                                <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {opacity: pressed? 0.5 : 1, backgroundColor:'black'},]} onPress={validateFields}>
-                                            <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
-                                                <Text style={[styles.buttonTexts, {color:'white'}]} >{dictionary.add}</Text>
-                                            </View>
-                                </Pressable>
-                            </SafeAreaView>
-                        </ScrollView>
-                    </View>
-                </View>
-                <Nav></Nav>
-            </LinearGradient>
+                    <Nav></Nav>
+                </LinearGradient>
         </View>
 
     );

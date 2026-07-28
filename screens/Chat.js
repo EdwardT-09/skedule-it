@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {View, Text, TextInput, ScrollView, Pressable, ActivityIndicator} from 'react-native';
+import {View, Text, TextInput, KeyboardAvoidingView, ScrollView, Pressable, ActivityIndicator, Platform} from 'react-native';
 
+import { isNotLoggedIn } from '../util/common.js';
 import {supabase} from '../config/initSupabase.js';
 import {ai} from '../config/initGemini.js'
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,14 +18,15 @@ export default function Chat({navigation, route}) {
 
     const [notes, setNotes] = useState('');
 
-    useEffect(()=> {getNotes()}, [])
+    
+    useEffect(()=> {getNotes(),  isNotLoggedIn(navigation)}, [])
 
     const getNotes = async() =>{
-        console.log('hello')
+
         const user = (await supabase.auth.getUser()).data.user;
         
         if(!user) return;
-        console.log('hello2')
+
         
         const {data, error} = await supabase
         .from('notes')
@@ -32,8 +34,6 @@ export default function Chat({navigation, route}) {
         .eq('file_name', `${user.id}/${subjectID}/${fileName}`)
         .single()
         
-        console.log(error);
-        console.log(data.content)
         setNotes(data.content);
     }
 
@@ -74,11 +74,8 @@ export default function Chat({navigation, route}) {
                 ],
               });
             const answer = result.candidates?.[0]?.content?.parts?.[0]?.text;
-            console.log(answer);
+   
 
-            if(!answer){
-                console.log("no response")
-            }
 
             setMessages(prev =>[
                 ...prev,
@@ -88,33 +85,45 @@ export default function Chat({navigation, route}) {
                 }
             ])
         } catch(err){
-            console.log(err)
+
+            const errorMessage = err?.message || "sorry! it seems that something went wrong while generating a response";
+
+            setMessages(prev =>[
+                ...prev,
+                {
+                    role:"error",
+                    text:errorMessage,
+                }
+            ])
         }
-        setLoading(false);
+        finally{
+        setLoading(false);}
   }
 
   return (
     <View style={{ flex: 1 }}>
-        <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
-            <Header includeBack navigation={navigation} />
-            <ScrollView style={{flex:1}} contentContainerStyle={{padding:15}}>
-                {messages.map((msg, index) => (
-                    <View key={index} style={[styles.chat, {alignSelf: msg.role === "user"? 'flex-end' : 'flex-start', backgroundColor: msg.role === "user" ? '#FEE172' : '#cdf5e9'}]}>
-                        <Text>{msg.text}</Text>
-                    </View>
-                ))}
-                {loading && (
-                    <ActivityIndicator size="small"/>
-                )}
-            </ScrollView>
-            <View style={{padding:15, paddingBottom:50}}>
-                <TextInput placeholder="ask me some questions" style={{borderWidth:1, borderColor:'#3f3f3f', marginBottom:'5%'}} value={question} onChangeText={setQuestion}></TextInput>
-                <Pressable onPress={()=> askAI()}style={{backgroundColor: '#1e1e1e', padding:'3.5%', borderRadius:50, marginBottom:'5%'}}>
-                    <Text style={[styles.buttonTexts,{textAlign:'center', color:'white'}]}>send</Text>
-                </Pressable>
-                <Text>powered by gemini</Text>
-            </View>
-        </LinearGradient>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={0} >
+            <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
+                <Header includeBack navigation={navigation} />
+                <ScrollView style={{flex:1}} contentContainerStyle={{padding:15}}>
+                    {messages.map((msg, index) => (
+                        <View key={index} style={[styles.chat, {alignSelf: msg.role === "user"? 'flex-end' : 'flex-start', backgroundColor: msg.role === "user" ? '#FEE172' : msg.role === "error" ? '#ffddd' : '#cdf5e9'}]}>
+                            <Text style={{color:msg.role === "error" ? "#c62828" : "black"}}>{msg.text}</Text>
+                        </View>
+                    ))}
+                    {loading && (
+                        <ActivityIndicator size="small"/>
+                    )}
+                </ScrollView>
+                <View style={{padding:15, paddingBottom:50}}>
+                    <TextInput placeholder="ask me some questions" style={{borderWidth:1, borderColor:'#3f3f3f', marginBottom:'5%', padding:5, fontSize:16}} placeholderTextColor='#555555' value={question} onChangeText={setQuestion}></TextInput>
+                    <Pressable onPress={()=> askAI()}style={{backgroundColor: '#1e1e1e', padding:'3.5%', borderRadius:50, marginBottom:'5%'}}>
+                        <Text style={[styles.buttonTexts,{textAlign:'center', color:'white'}]}>send</Text>
+                    </Pressable>
+                    <Text>powered by gemini</Text>
+                </View>
+            </LinearGradient>
+        </KeyboardAvoidingView>
     </View>
   );
 }

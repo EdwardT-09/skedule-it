@@ -5,7 +5,7 @@ import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { formatTimeOnly } from '../util/common.js';
+import { formatTimeOnly, isNotLoggedIn } from '../util/common.js';
 import useDictionary from '../hook/useDictionary.js'
 import {supabase} from '../config/initSupabase.js';
 import { ai } from '../config/initGemini.js';
@@ -13,6 +13,7 @@ import { validateSubject, validateDate, validateDateTime, validateTimes, validat
 import Header from '../components/Header.js';
 import Nav from '../components/Nav.js';
 import styles from '../assets/style.js';
+import { getAvgConfidenceBySubject, getDurationBySubject, getSessionCountBySubject } from '../util/performanceStats.js';
 
 export default function AddSchedule ({navigation, route}){
     const [subject, setSubject] = useState('');
@@ -22,6 +23,9 @@ export default function AddSchedule ({navigation, route}){
     const [endDate, setEndDate] = useState(new Date());
     const [color, setColor] = useState('');
     const [days, setDays] = useState([]);
+
+    const [subjects, setSubjects] = useState([]);
+    const [logs, setLogs] = useState([]);
 
 
     const [isAiMode, setIsAiMode] = useState(false);
@@ -41,23 +45,27 @@ export default function AddSchedule ({navigation, route}){
     const [colorError, setColorError] = useState('');
 
     
-    const [startPickerMode, setStartPickerMode] = useState('time');
-    const [startDatePickerMode, setStartDatePickerMode] = useState('date');
-    const [endTimePickerMode, setEndTimePickerMode] = useState('time');
-    const [endPickerMode, setEndPickerMode] = useState('date');
+    // const [startPickerMode, setStartPickerMode] = useState('time');
+    // const [startDatePickerMode, setStartDatePickerMode] = useState('date');
+    // const [endTimePickerMode, setEndTimePickerMode] = useState('time');
+    // const [endPickerMode, setEndPickerMode] = useState('date');
 
 
     const weekDay = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const eventID = route?.params?.scheduleID;
     const method = route?.params?.method;
-    const dictionary = useDictionary();
+    const {dictionary, loading} = useDictionary();
 
-    console.log(eventID);
+    useEffect(()=>{
+        isNotLoggedIn(navigation)
+    },[])
+
      useEffect(()=> {
         if(eventID && method == 'Edit'){
             editEvent();
         } 
     }, [eventID])
+    
 
     const editEvent = async() =>{
 
@@ -74,19 +82,27 @@ export default function AddSchedule ({navigation, route}){
             .eq('id', eventID)
             .single()
 
-        console.log(data)
-        
-        if(error){
-            console.log(error);
-        }
 
         setSubject(data.title)
         setStartDate(new Date(data.start_date))
-        setStartTime(new Date(data.start_time))
-        setEndTime(new Date(data.end_time))
         setEndDate(new Date(data.end_date))
         setDays(data.recurring)
         setColor(data.color);
+
+        const start = new Date();
+        const [startHour, startMinute] = data.start_time.split(':');
+
+        start.setHours(Number(startHour));
+        start.setMinutes(Number(startMinute));
+
+        const end = new Date();
+        const [endHour, endMinute] = data.end_time.split(':');
+
+        end.setHours(Number(endHour));
+        end.setMinutes(Number(endMinute));
+
+        setStartTime(start);
+        setEndTime(end);
     }
 
 
@@ -97,7 +113,109 @@ export default function AddSchedule ({navigation, route}){
         )
     } 
 
-   
+    const handleAIGenerate = async() =>{
+        setIsGenerating(true);
+        const user = (await supabase.auth.getUser()).data.user;
+
+        if(!user) return;
+
+        //formatted dates according to the local timezone
+        const formattedStartDate = startDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Kuala_Lumpur' });
+        const formattedEndDate = endDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Kuala_Lumpur' });
+
+        const { data: existingSchedules } = await supabase
+        .from("schedule_events")
+        .select(`
+            title,
+            start_date,
+            end_date,
+            start_time,
+            end_time,
+            recurring
+            `)
+            .eq("user_id", user?.id)
+            .lte("start_date", formattedEndDate)
+            .gte("end_date", formattedStartDate)
+
+
+        const subjects = await fetchSubjects();
+        const logs = await fetchLogs();
+
+        const durationStats = getDurationBySubject(subjects, logs);
+        const sessionStats = getSessionCountBySubject(subjects, logs);
+        const confidenceStats = getAvgConfidenceBySubject(subjects, logs);
+
+        const performanceStats = subjects.map(subject =>({
+            subject:subject.name,
+            totalStudyMinutes: durationStats[subject.id].totalDuration,
+            totalSessions: sessionStats[subject.id].sessions,
+            averageConfidence: Number(
+                confidenceStats[subject.id].avgConfidence.toFixed(1)
+            )
+        }));       
+    
+
+    try{
+        const prompt = `
+            User goal:
+            ${aiPromptInput}
+
+            Existing schedule: 
+            ${JSON.stringify(existingSchedules, null, 2)}
+
+            Performance statistics:
+            ${JSON.stringify(performanceStats, null, 2)}
+
+            You are an AI study planning assistant. Build a structural, balanced timetable or schedule matching these criteria:
+            - Goal context / Subject context / Guidelines: "${aiPromptInput || 'General study schedule mapping'}"
+            - The schedule timeline explicitly starts on: ${formattedStartDate}
+            - The schedule timeline explicitly ends on: ${formattedEndDate}
+
+            Generate complete event rows for this timeline window. Return ONLY a valid JSON array of objects. Each object maps perfectly to the database model schema details below:
+            - user_id (string): Use exactly "${user.id}"
+            - title (string): High contrast title descriptive of the task block
+            - color (string): Provide a vibrant hex aesthetic palette choice matching your design language. Use only these values: '#FFA94D', '#FEE172', '#FFB6C1', or '#cdf5e9'
+            - start_date (string): String date block formatted as YYYY-MM-DD
+            - end_date (string): String terminal boundary limit sequence formatted as YYYY-MM-DD (set this to ${formattedEndDate} for recurring elements)
+            - start_time (string): The clock window limit hour formatted cleanly as HH:MM:SS (e.g. "09:00:00", "14:30:00")
+            - end_time (string): The completion block formatted cleanly as HH:MM:SS (e.g. "11:00:00", "16:00:00")
+            - recurring (array of strings): Shorthand text items matching day blocks the event populates on each week. E.g. ["Mon", "Wed"]. If it's a single entry, keep it empty []
+
+            Output purely the plain structural array JSON payload. Do not use markdown tags or backticks (\`\`\`json).
+            `;
+
+
+        const response = await ai.models.generateContent({
+            model:"gemini-2.5-flash",
+            contents:[{role: "user", parts:[{text:prompt}]}],
+        });
+
+        const responseText = response.text || response.candidate?.[0]?.content?.parts?.[0]?.text;
+        const cleanJsonText = responseText.replace(/```json/g, '').replace(/```/g, ''). trim();
+        const eventsArray = JSON.parse(cleanJsonText);
+        const eventsWithUser = eventsArray.map(event => ({
+            ...event,
+            user_id: user.id
+        }));
+
+
+        if(Array.isArray(eventsWithUser)){
+            const {error:insertError} = await supabase
+            .from('schedule_events')
+            .insert(eventsWithUser);
+
+            if(!insertError){
+                navigation.navigate('Schedule');
+            } 
+        }
+
+    } catch (error){
+        console.log("Error:" + error);
+    } finally {
+        setIsGenerating(false);
+    }
+    }
+
     const validateFields = () =>{
         const subjectErr = validateSubject(subject, dictionary);
         const timeErr = validateTimes(startTime, endTime, dictionary);
@@ -124,7 +242,8 @@ export default function AddSchedule ({navigation, route}){
 
         if(!user) return;
 
-        console.log("HI2");
+
+
         const formattedStartDate = startDate.toLocaleDateString('en-CA', {
         timeZone: 'Asia/Kuala_Lumpur'
         })
@@ -156,6 +275,7 @@ export default function AddSchedule ({navigation, route}){
             const {data, error} = await supabase
             .from('schedule_events')
             .insert({
+                    user_id: user.id,
                     title : subject,
                     start_date : formattedStartDate,
                     start_time: formatTimeOnly(startTime),  
@@ -168,81 +288,132 @@ export default function AddSchedule ({navigation, route}){
             if(!error){
                 navigation.navigate('Schedule');
             }
-            console.log(error);
     }}
+
+        const fetchSubjects = async() =>{
+            const user = (await supabase.auth.getUser()).data.user;
+    
+            if(!user) return;
+    
+    
+            const {data, error} = await supabase
+            .from('subjects')
+            .select('id, name')
+            .eq('user_id', user?.id)
+    
+            if(error){
+                return []
+            }
+
+            return data;
+        }
+    
+        const fetchLogs = async() =>{
+            const user = (await supabase.auth.getUser()).data.user;
+    
+            if(!user) return;
+    
+
+    
+            const {data, error} = await supabase
+            .from('performance_log')
+            .select('id, subject, duration, confidence')
+            .eq('user_id', user?.id)
+            .gte("created_at", startDate.toISOString())
+            .lte("created_at", endDate.toISOString());
+    
+            if(error){
+                return [];
+            }
+
+            return data;
+    
+        }
+
+    if(loading){
+            return(
+                <View style={{flex:1}}>
+                <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
+                    <Header></Header>
+                <View style={{flex: 1, justifyContent:"center", alignItems:"center"}}>
+                    <ActivityIndicator size="large" color="black"></ActivityIndicator>
+                </View>
+                </LinearGradient>
+                </View>
+            )
+        }
 
     return(
         <View style={{flex:1,}}>
             <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
-                <Header includeBack navigation={navigation}></Header>
-                <View style={{flex:0, alignItems:'center'}}>
-                <View style={[styles.container, ]}>
-                    <View style={[styles.titleContainer]}>
-                        <View style={{paddingHorizontal: '5%'}}>
-                            <Text style={styles.subtitle}>{dictionary.lets_go}</Text>
-                            <Text style={styles.title}>
-                                {dictionary.add_schedule}
-                            </Text>
+                    <Header includeBack navigation={navigation}></Header>
+                    <View style={{flex:0, alignItems:'center'}}>
+                    <View style={[styles.container, ]}>
+                        <View style={[styles.titleContainer]}>
+                            <View style={{paddingHorizontal: '5%'}}>
+                                <Text style={styles.subtitle}>{dictionary.lets_go}</Text>
+                                <View style={{flex:0, flexDirection:'row', justifyContent:'space-between'}}>
+                                    <Text style={styles.title}>
+                                        {dictionary.add_schedule}
+                                    </Text>
+                                    <Pressable onPress={()=> setIsAiMode(!isAiMode)}
+                                    style={{ width:'30%', borderWidth:2, borderColor:'black', marginHorizontal:8, padding:8, backgroundColor: isAiMode ? '#FEE172' : '#cdf5e9'}}>
+                                        <Text style={{textAlign:'center'}}>{isAiMode ? 'Manual' : 'AI Mode'}</Text>
+                                    </Pressable>
+                                </View>
+                            </View>
+
                         </View>
-                    </View>
-                        <ScrollView style={{height:'70%'}}>
-                            <SafeAreaView style={{paddingHorizontal: 15}}>
+                            <ScrollView style={{height:'70%'}}>
+                                <SafeAreaView style={{paddingHorizontal: 15}}>
+                                {!isAiMode? (
+                                        <View style={styles.fields}>
+                                            <Text style={styles.fieldLabels}>{dictionary.subject}:</Text>
+                                            <TextInput style={styles.input} placeholder={dictionary.subject_placeholder} value={subject} onChangeText={setSubject} placeholderTextColor='#555555'></TextInput>
+                                            {subjectError ? (<Text style={styles.errorText}>{subjectError}</Text>) : null}
+                                        </View>):null}
                                 <View style={styles.fields}>
-                                    <Text style={styles.fieldLabels}>{dictionary.subject}:</Text>
-                                    <TextInput style={styles.input} placeholder={dictionary.subject_placeholder} value={subject} onChangeText={setSubject}></TextInput>
-                                    {subjectError ? (<Text style={styles.errorText}>{subjectError}</Text>) : null}
-                                </View>
-                            <View style={styles.fields}>
-                                    <Text style={styles.fieldLabels}>{dictionary.start_date}:</Text>
-                                    <Pressable style={{backgroundColor:'transparent'}} onPress={()=> setShowStartDate(true)} ><View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}>
-                                        <Text>{startDate.getDate()}/{startDate.getMonth()+1}/{startDate.getFullYear()}</Text></View></Pressable>
-                                    {showStartDate && (
-                                    <DateTimePicker
-                                    value={startDate}
-                                    mode={startDatePickerMode}
-                                    is24Hour={true}
-                                    onChange={(event, selectedDate) => {
-                                        setStartDate(selectedDate)
-                                        setShowStartDate(false);
-                                        return;
+                                        <Text style={styles.fieldLabels}>{dictionary.start_date}:</Text>
+                                        <Pressable style={{backgroundColor:'transparent'}} onPress={()=> setShowStartDate(true)} ><View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}>
+                                            <Text>{startDate.getDate()}/{startDate.getMonth()+1}/{startDate.getFullYear()}</Text></View></Pressable>
+                                        {showStartDate && (
+                                        <DateTimePicker
+                                        value={startDate}
+                                        mode="date"
+                                        is24Hour={true}
+                                        onChange={(event, selectedDate) => {
+                                            setStartDate(selectedDate)
+                                            setShowStartDate(false);
+                                            return;
+                                        
+                                        }} 
+                                    />
+
                                     
-                                    }} 
-                                />
 
-                                
-
-                                )}
-                                {startDateError ? (<Text style={styles.errorText}>{startDateError}</Text>) : null}
-                                </View>
+                                    )}
+                                    {startDateError ? (<Text style={styles.errorText}>{startDateError}</Text>) : null}
+                                    </View>
+                                {!isAiMode? (   
                                     <View style={styles.fields}>
-                                    <Text style={styles.fieldLabels}>{dictionary.start_time}:</Text>
-                                    <Pressable style={{backgroundColor:'transparent'}} onPress={()=> setShowStartTime(true)} ><View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}>
-                                        <Text>{startTime.getHours()}:{startTime.getMinutes()}</Text></View></Pressable>
-                                    {showStartTime && (
-                                    <DateTimePicker
-                                    value={startTime}
-                                    mode={startPickerMode}
-                                    is24Hour={true}
-                                    onChange={(event, selectedDate) => { if (!selectedDate) {
-                                        setStartTime(selectedDate)
-                                        setShowStartTime(false);
-                                        return;
-                                    }
-                                    if(Platform.OS == 'android'){
-                                        if (startPickerMode === 'date') {
-                                            const newDate = new Date(startTime);
-
-                                            newDate.setFullYear(
-                                            selectedDate.getFullYear(),
-                                            selectedDate.getMonth(),
-                                            selectedDate.getDate()
-                                            );
-
-                                            setStartTime(newDate);
-
-                                            // Open time picker next
-                                            setStartPickerMode('time');
-                                        } else {
+                                        <Text style={styles.fieldLabels}>{dictionary.start_time}:</Text>
+                                        <Pressable style={{backgroundColor:'transparent'}} onPress={()=> setShowStartTime(true)} ><View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}>
+                                        <Text>
+                                                {`${startTime.getHours() % 12 || 12}:${String(startTime.getMinutes()).padStart(2, '0')} ${startTime.getHours() >= 12 ? 'PM' : 'AM'}`}
+                                            </Text>
+                                            </View>
+                                        </Pressable>
+                                        {showStartTime && (
+                                        <DateTimePicker
+                                        value={startTime}
+                                        mode="time"
+                                        is24Hour={true}
+                                        onChange={(event, selectedDate) => { if (!selectedDate) {
+                                            setStartTime(selectedDate)
+                                            setShowStartTime(false);
+                                            return;
+                                        }
+                                        if(Platform.OS == 'android'){
                                             const newDate = new Date(startTime);
 
                                             newDate.setHours(selectedDate.getHours());
@@ -250,95 +421,153 @@ export default function AddSchedule ({navigation, route}){
 
                                             setStartTime(newDate);
                                             setShowStartTime(false);
-                                            setStartPickerMode('date');
-                                        }
-                                        }else if (Platform.OS == 'ios'){
-                                            if (selectedDate){
-                                                setStartTime(selectedDate);
-                                            }
-                                            setStartPickerMode('time')
-                                        }}} 
-                                />
+                                 
+                                        
+                                            }else if (Platform.OS == 'ios'){
+                                                if (selectedDate){
+                                                    setStartTime(selectedDate);
+                                                }
+                                             
+                                            }}} 
+                                    />
 
-                                
+                                    
 
-                                )}
-                                {timeError ? (<Text style={styles.errorText}>{timeError}</Text>) : null}
-                                </View>
-
-                                <View style={styles.fields}>
-                                    <Text style={styles.fieldLabels}>{dictionary.end_time}:</Text>
-                                    <Pressable style={{backgroundColor:'transparent'}} onPress={()=> setShowEndTime(true)} ><View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}>
-                                        <Text>{endTime.getHours()}:{endTime.getMinutes()}</Text></View></Pressable>
-                                    {showEndTime && (
-                                    <DateTimePicker
-                                    value={endTime}
-                                    mode={endTimePickerMode}
-                                    is24Hour={true}
-                                    onChange={(event, selectedDate) => { if (!selectedDate) {
-                                        setEndTime(selectedDate)
-                                        setShowEndTime(false);
-                                        return;
-                                    }
-                                    if(Platform.OS == 'android'){
-                                        if (endTimePickerMode === 'date') {
-                                            const newDate = new Date(endTime);
-
-                                            newDate.setFullYear(
-                                            selectedDate.getFullYear(),
-                                            selectedDate.getMonth(),
-                                            selectedDate.getDate()
-                                            );
-
-                                            setEndTime(newDate);
-
-                                            // Open time picker next
-                                            setEndTimePickerMode('time');
-                                        } else {
-                                            const newEndTime = new Date(endTime);
-
-                                            newEndTime.setHours(selectedDate.getHours());
-                                            newEndTime.setMinutes(selectedDate.getMinutes());
-
-                                            setEndTime(newDate);
-                                            setShowEndTime(false);
-                                            setEndTimePickerMode('date');
-                                        }
-                                        }else if (Platform.OS == 'ios'){
-                                            if (selectedDate){
-                                                setEndTime(selectedDate);
-                                            }
-                                            setEndTimePickerMode('time')
-                                        }}} 
-                                />
-
-                                
-
-                                )}
-                                {timeError ? (<Text style={styles.errorText}>{timeError}</Text>) : null}
-                                </View>
-                                <View style={styles.fields}>
-                                    <Text style={styles.fieldLabels}>{dictionary.recurring}:</Text>
-                                    <View style={{flex:0, flexDirection:'row', justifyContent:'space-around'}}>
-                                        {weekDay.map((day) =>(<Pressable key={day} onPress={()=> toggleDay(day)} style={{ borderColor: days.includes(day) ? "black" : null, padding:10, borderWidth: days.includes(day) ? 1 : null}}><Text style={{fontFamily:'JetBrainsMono_400Regular', fontSize:12}}>{day}</Text></Pressable>))}
+                                    )}
+                                    {timeError ? (<Text style={styles.errorText}>{timeError}</Text>) : null}
                                     </View>
-                                </View>
-                                {days?.length > 0  && (<View><View style={styles.fields}>
-                                    <Text style={styles.fieldLabels}>{dictionary.end_date}:</Text>
-                                    <Pressable style={{backgroundColor:'transparent'}} onPress={()=> setShowEndDate(true)} >
-                                        <View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}>
-                                            <Text>{endDate.getDate()}/{endDate.getMonth() + 1}/{endDate.getFullYear()}</Text></View></Pressable>
-                                    {showEndDate && (
-                                    <DateTimePicker
-                                    value={endDate}
-                                    mode={endPickerMode}
-                                    is24Hour={true}
-                                    onChange={(event, selectedDate) => { if (!selectedDate) {
-                                        setShowEndDate(false);
-                                        return;
-                                    }
-                                    if(Platform.OS == 'android'){
-                                        if (endPickerMode === 'date') {
+                                ): null}
+                                    {isAiMode? (
+                                        <View>
+                                            <View><View style={styles.fields}>
+                                            <Text style={styles.fieldLabels}>{dictionary.end_date}:</Text>
+                                            <Pressable style={{backgroundColor:'transparent'}} onPress={()=> setShowEndDate(true)} >
+                                                <View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}>
+                                                    <Text>{endDate.getDate()}/{endDate.getMonth() + 1}/{endDate.getFullYear()}</Text></View></Pressable>
+                                            {showEndDate && (
+                                            <DateTimePicker
+                                            value={endDate}
+                                            mode="date"
+                                            is24Hour={true}
+                                            onChange={(event, selectedDate) => { if (!selectedDate) {
+                                                setShowEndDate(false);
+                                                return;
+                                            }
+                                            if(Platform.OS == 'android'){
+                                                    const newEndDate = new Date(endDate);
+
+                                                    newEndDate.setFullYear(
+                                                    selectedDate.getFullYear(),
+                                                    selectedDate.getMonth(),
+                                                    selectedDate.getDate()
+                                                    );
+
+                                                    setEndDate(newEndDate);
+                                                    setShowEndDate(false)
+
+                        
+                                                
+                                                }else if (Platform.OS == 'ios'){
+                                                    if(selectedDate){
+                                                        setEndDate(selectedDate);
+                                                    }
+                                                  
+                                                }}} 
+                                        />
+
+                                        )}
+                                        {endDateError ? (<Text style={styles.errorText}>{endDateError}</Text>) : null}
+                                        </View>
+                                    
+                                        </View>
+                                        
+                                            <View style={styles.fields}>
+                                                <Text style={styles.fieldLabels}>{dictionary.ai_prompt}</Text>
+                                                <TextInput style={styles.input} value={aiPromptInput} onChangeText={setAiPromptInput} placeholder={dictionary.ai_prompt_placeholder} placeholderTextColor='#555555'></TextInput>
+                                            </View>
+                                            <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {opacity: pressed || isGenerating ? 0.5 : 1, backgroundColor:'black', marginTop: 15}]}
+                                                onPress={handleAIGenerate}
+                                                disabled={isGenerating}>
+                                                <View style={{flexDirection:'row', alignItems:'center'}}>
+                                                    {isGenerating ? (
+                                                        <ActivityIndicator color="white" style={{marginRight:10}}/>
+                                                        
+                                                    ): null}
+                                                    <Text style={[styles.buttonTexts, {color:'white'}]}>
+                                                        {isGenerating? `${dictionary.generating}...` : dictionary.add}
+                                                    </Text>
+
+
+                                                </View>
+
+                                            </Pressable>
+                                        </View>
+                                    ):
+                                    (
+                                    <View>
+                                    <View style={styles.fields}>
+                                        <Text style={styles.fieldLabels}>{dictionary.end_time}:</Text>
+                                        <Pressable style={{backgroundColor:'transparent'}} onPress={()=> setShowEndTime(true)} ><View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}>
+                                            <Text>
+                                                {`${endTime.getHours() % 12 || 12}:${String(endTime.getMinutes()).padStart(2, '0')} ${endTime.getHours() >= 12 ? 'PM' : 'AM'}`}
+                                            </Text></View></Pressable>
+                                        {showEndTime && (
+                                        <DateTimePicker
+                                        value={endTime}
+                                        mode="time"
+                                        is24Hour={true}
+                                        onChange={(event, selectedDate) => { if (!selectedDate) {
+                                            setEndTime(selectedDate)
+                                            setShowEndTime(false);
+                                            return;
+                                        }
+                                        if(Platform.OS == 'android'){
+                                                const newEndTime = new Date(endTime);
+
+                                                newEndTime.setHours(selectedDate.getHours());
+                                                newEndTime.setMinutes(selectedDate.getMinutes());
+
+                                                setEndTime(newEndTime);
+                                                setShowEndTime(false);
+
+                                            
+                                            }else if (Platform.OS == 'ios'){
+                                                if (selectedDate){
+                                                    setEndTime(selectedDate);
+                                                }
+                                        
+                                            }}} 
+                                    />
+
+                                    
+
+                                    )}
+                                    {timeError ? (<Text style={styles.errorText}>{timeError}</Text>) : null}
+                                    </View>
+
+                                    
+                                    <View style={styles.fields}>
+                                        <Text style={styles.fieldLabels}>{dictionary.recurring}:</Text>
+                                        <View style={{flex:0, flexDirection:'row', justifyContent:'space-around'}}>
+                                            {weekDay.map((day) =>(<Pressable key={day} onPress={()=> toggleDay(day)} style={{ borderColor: days.includes(day) ? "black" : null, padding:10, borderWidth: days.includes(day) ? 1 : null}}><Text style={{fontFamily:'JetBrainsMono_400Regular', fontSize:12}}>{day}</Text></Pressable>))}
+                                        </View>
+                                    </View>
+                                    {days?.length > 0  && (<View><View style={styles.fields}>
+                                        <Text style={styles.fieldLabels}>{dictionary.end_date}:</Text>
+                                        <Pressable style={{backgroundColor:'transparent'}} onPress={()=> setShowEndDate(true)} >
+                                            <View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}>
+                                                <Text>{endDate.getDate()}/{endDate.getMonth() + 1}/{endDate.getFullYear()}</Text></View></Pressable>
+                                        {showEndDate && (
+                                        <DateTimePicker
+                                        value={endDate}
+                                        mode="date"
+                                        is24Hour={true}
+                                        onChange={(event, selectedDate) => { if (!selectedDate) {
+                                            setShowEndDate(false);
+                                            return;
+                                        }
+                                        if(Platform.OS == 'android'){
+                                     
                                             const newEndDate = new Date(endDate);
 
                                             newEndDate.setFullYear(
@@ -348,56 +577,47 @@ export default function AddSchedule ({navigation, route}){
                                             );
 
                                             setEndDate(newEndDate);
-
-                   
-                                            setEndPickerMode('time');
-                                        } else {
-                                            const newEndDate = new Date(endDate);
-
-                                            newEndDate.setHours(selectedDate.getHours());
-                                            newEndDate.setMinutes(selectedDate.getMinutes());
-
-                                            setEndDate(newEndDate);
                                             setShowEndDate(false);
-                                            setEndPickerMode('date');
-                                        }
-                                        }else if (Platform.OS == 'ios'){
-                                            if(selectedDate){
-                                                setEndDate(selectedDate);
-                                            }
-                                            setEndPickerMode('date')
-                                        }}} 
-                                />
+                                                           
+                                            }else if (Platform.OS == 'ios'){
+                                                if(selectedDate){
+                                                    setEndDate(selectedDate);
+                                                }
+                                               
+                                            }}} 
+                                    />
 
-                                )}
-                                {endDateError ? (<Text style={styles.errorText}>{endDateError}</Text>) : null}
-                                </View>
-                              
-                                </View>
-                                )}
-                                <View style={styles.fields}>
-                                    <View style={{flex:0, flexDirection:'row', justifyContent:'space-between'}}>
-                                        <Text style={styles.fieldLabels}>{dictionary.color}:</Text>
+                                    )}
+                                    {endDateError ? (<Text style={styles.errorText}>{endDateError}</Text>) : null}
                                     </View>
-                                    <View style={{flex:0, flexDirection:'row', }}>
-                                        <Pressable onPress={()=> color === '#FFA94D' ? setColor('') : setColor('#FFA94D') } style={{borderColor:'black' , borderWidth:color === '#FFA94D' ? 1 :0 , marginRight:10, padding:15, backgroundColor: '#FFA94D'}}></Pressable>
-                                        <Pressable onPress={()=> color  === '#FEE172' ? setColor('') : setColor('#FEE172')} style={{borderColor:'black', borderWidth:  color === '#FEE172' ? 1 :0, marginRight:10, padding:15, backgroundColor:'#FEE172'}}></Pressable>
-                                        <Pressable onPress={()=> color  === '#FFB6C1' ? setColor('') : setColor('#FFB6C1')} style={{borderColor:'black', borderWidth: color === '#FFB6C1' ? 1 : 0 , marginRight:10, padding:15, backgroundColor:  '#FFB6C1'}}></Pressable>
-                                        <Pressable onPress={()=> color  === '#cdf5e9' ? setColor('') : setColor('#cdf5e9')} style={{borderColor:'black', borderWidth: color === '#cdf5e9' ? 1 : 0, padding:15, backgroundColor:  '#cdf5e9'}}></Pressable>
+                                
                                     </View>
-                                    {colorError ? (<Text style={styles.errorText}>{colorError}</Text>): null}
-                                </View>
-                       
-                                <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {opacity: pressed? 0.5 : 1, backgroundColor:'black'},]} onPress={validateFields}>
-                                            <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
-                                                <Text style={[styles.buttonTexts, {color:'white'}]} >{dictionary.add}</Text>
-                                            </View>
-                                </Pressable>
-                            </SafeAreaView>
-                        </ScrollView>
+                                    )}
+                                    <View style={styles.fields}>
+                                        <View style={{flex:0, flexDirection:'row', justifyContent:'space-between'}}>
+                                            <Text style={styles.fieldLabels}>{dictionary.color}:</Text>
+                                        </View>
+                                        <View style={{flex:0, flexDirection:'row', }}>
+                                            <Pressable onPress={()=> color === '#FFA94D' ? setColor('') : setColor('#FFA94D') } style={{borderColor:'black' , borderWidth:color === '#FFA94D' ? 1 :0 , marginRight:10, padding:15, backgroundColor: '#FFA94D'}}></Pressable>
+                                            <Pressable onPress={()=> color  === '#FEE172' ? setColor('') : setColor('#FEE172')} style={{borderColor:'black', borderWidth:  color === '#FEE172' ? 1 :0, marginRight:10, padding:15, backgroundColor:'#FEE172'}}></Pressable>
+                                            <Pressable onPress={()=> color  === '#FFB6C1' ? setColor('') : setColor('#FFB6C1')} style={{borderColor:'black', borderWidth: color === '#FFB6C1' ? 1 : 0 , marginRight:10, padding:15, backgroundColor:  '#FFB6C1'}}></Pressable>
+                                            <Pressable onPress={()=> color  === '#cdf5e9' ? setColor('') : setColor('#cdf5e9')} style={{borderColor:'black', borderWidth: color === '#cdf5e9' ? 1 : 0, padding:15, backgroundColor:  '#cdf5e9'}}></Pressable>
+                                        </View>
+                                        {colorError ? (<Text style={styles.errorText}>{colorError}</Text>): null}
+                                    </View>
+                        
+                                    <Pressable style={({pressed}) => [styles.trueCenter, styles.buttons, {opacity: pressed? 0.5 : 1, backgroundColor:'black'},]} onPress={validateFields}>
+                                                <View style={[{flexDirection:'row'}, {alignItems:'center'}]}>
+                                                    <Text style={[styles.buttonTexts, {color:'white'}]} >{dictionary.add}</Text>
+                                                </View>
+                                    </Pressable>
+                                    </View>
+                                    )}
+                                </SafeAreaView>
+                            </ScrollView>
+                        </View>
                     </View>
-                </View>
-            </LinearGradient>
+                </LinearGradient>
         </View>
 
     );

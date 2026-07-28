@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView} from "react-native";
+import React, {useState, useEffect} from 'react';
+import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView, ActivityIndicator} from "react-native";
 import {SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -29,7 +29,7 @@ export default function Register({navigation}) {
     const [showPassword, setShowPassword] = useState(true);
     const [showConfirmPassword, setShowConfirmPassword] = useState(true);
 
-    const dictionary = useDictionary();
+    const {dictionary, loading} = useDictionary();
 
     const handleRegister = async() => {
         const usernameErr = validateUsername(username, dictionary);
@@ -43,26 +43,47 @@ export default function Register({navigation}) {
         setGenderError(genderErr);
         setPasswordError(passwordErr);
         setPassword2Error(password2Err);
-        setGeneralError(typeof password2Err);
+        setGeneralError(password2Err);
         
         if(usernameErr === null && emailErr === null && genderErr === null && passwordErr === null && password2Err === null){
-            setGeneralError("HI55");
-            const error = await onRegister(username, email, gender, password);
-            setGeneralError(error);
-        }else{
-            setGeneralError("HI2");
-        }
+            try {
+                const usernameTrim = username.trim();
+                const emailTrim = email.trim();
+                const error = await onRegister(username, email, gender, password);
 
-            console.log ("General Error:", generalError);
-        if(generalError === null){
-            return navigation.navigate('Home');
+                if (error) {
+                    setGeneralError(error);
+                    return;
+                }
+
+                navigation.navigate('RegisterConfirmation');
+
+            } catch (e) {
+                setGeneralError(e.message);
+            }
+        
+        
+
         }else{
-            setGeneralError(error);
-            return
+            setGeneralError(generalError);
         }
 
         return false;
     }
+
+    if(loading){
+        return(
+            <View style={{flex:1}}>
+            <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
+                <Header></Header>
+            <View style={{flex: 1, justifyContent:"center", alignItems:"center"}}>
+                <ActivityIndicator size="large" color="black"></ActivityIndicator>
+            </View>
+            </LinearGradient>
+            </View>
+        )
+    }
+
     return (
             <ScrollView>
             <View style={{flex:1}}>
@@ -81,12 +102,12 @@ export default function Register({navigation}) {
                                     <SafeAreaView style={{paddingHorizontal: 20}}>
                                         <View style={styles.fields}>
                                             <Text style={styles.fieldLabels}>{dictionary.username}:</Text>
-                                            <TextInput style ={styles.input} value={username} onChangeText={setUsername} placeholder={dictionary.username_placeholder}></TextInput>
+                                            <TextInput style ={styles.input} value={username} onChangeText={setUsername} placeholder={dictionary.username_placeholder} placeholderTextColor='#555555'></TextInput>
                                             {usernameError? (<Text style={styles.errorText}>{usernameError}</Text>) : null}
                                         </View>
                                         <View style={styles.fields}>
                                             <Text style={styles.fieldLabels}>{dictionary.email}:</Text>
-                                            <TextInput style ={styles.input} value={email} onChangeText={setEmail} placeholder={dictionary.email_placeholder}></TextInput>
+                                            <TextInput style ={styles.input} value={email} onChangeText={setEmail} placeholder={dictionary.email_placeholder} placeholderTextColor='#555555'></TextInput>
                                             {emailError? (<Text style={styles.errorText}>{emailError}</Text>) : null}
                                         </View>
                                         <View style={styles.fields}>
@@ -99,15 +120,15 @@ export default function Register({navigation}) {
                                         </View>
                                         <View style={styles.fields}>
                                             <Text style={styles.fieldLabels}>{dictionary.password}:</Text>
-                                            <TextInput style ={styles.input} secureTextEntry={showPassword} value={password} onChangeText={setPassword} placeholder={dictionary.password_placeholder}></TextInput>
+                                            <TextInput style ={styles.input} secureTextEntry={showPassword} value={password} onChangeText={setPassword} placeholder={dictionary.password_placeholder} placeholderTextColor='#555555'></TextInput>
                                             <Pressable onPress={()=> setShowPassword(!showPassword)}>
-                                                <Text style={styles.visiblePassword}>{showPassword ? dictionary.show : dictionary.hide }{dictionary.password}</Text>
+                                                <Text style={styles.visiblePassword}>{showPassword ? dictionary.show : dictionary.hide } {dictionary.password}</Text>
                                             </Pressable>
                                             {passwordError? (<Text style={styles.errorText}>{passwordError}</Text>) : null}
                                         </View>
                                         <View style={styles.fields}>
                                             <Text style={styles.fieldLabels}>{dictionary.confirm_password}:</Text>
-                                            <TextInput style ={styles.input} secureTextEntry={showConfirmPassword} value={password2} onChangeText={setPassword2} placeholder={dictionary.confirm_password_placeholder}></TextInput>
+                                            <TextInput style ={styles.input} secureTextEntry={showConfirmPassword} value={password2} onChangeText={setPassword2} placeholder={dictionary.confirm_password_placeholder} placeholderTextColor='#555555'></TextInput>
                                             <Pressable onPress={()=> setShowConfirmPassword(!showConfirmPassword)}>
                                                 <Text style={styles.visiblePassword}>{showConfirmPassword ? dictionary.show : dictionary.hide} {dictionary.password}</Text>
                                             </Pressable>

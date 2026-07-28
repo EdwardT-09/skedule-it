@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, Button, ImageBackground, Image, TextInput, Pressable,ScrollView, Switch} from "react-native";
+import { View, Text, Button, ImageBackground, Image,  Pressable,ScrollView, Switch} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import Modal from 'react-native-modal'
 import Markdown from 'react-native-markdown-display';
@@ -8,6 +8,7 @@ import useDictionary from '../hook/useDictionary.js';
 import {supabase} from '../config/initSupabase.js';
 import Header from '../components/Header.js';
 import styles from '../assets/style.js';
+import { isNotLoggedIn } from '../util/common.js';
 
 
 export default function NotesViewer ({navigation, route}){
@@ -18,6 +19,7 @@ export default function NotesViewer ({navigation, route}){
 
     useEffect(()=> {
         loadNotes();
+        isNotLoggedIn(navigation)
     }, [])
 
     const loadNotes = async() => {
@@ -32,7 +34,7 @@ export default function NotesViewer ({navigation, route}){
         .eq('file_name', `${user.id}/${subjectID}/${fileName}`)
         .single()
 
-        console.log(typeof(data.content))
+
         setNotes(data.content);
     }
 

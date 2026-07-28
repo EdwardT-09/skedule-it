@@ -18,6 +18,19 @@ export const isLoggedIn = async(navigation) => {
 }
 
 
+export const isNotLoggedIn = async(navigation) => {
+    const user = (await supabase.auth.getUser()).data.user;
+
+
+
+    if(!user){
+        navigation.navigate('Landing');
+    }
+}
+
+
+
+
 export function roundUpToDecimal(num, places) {
   const factor = Math.pow(10, places);
   return Math.ceil(num * factor) / factor;
@@ -26,3 +39,6 @@ export function roundUpToDecimal(num, places) {
 export function formatTimeOnly(date) {
   return date.toTimeString().split(' ')[0]; 
 };
+
+
+

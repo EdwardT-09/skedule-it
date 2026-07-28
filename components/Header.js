@@ -17,8 +17,12 @@ export default function Header({includeBack = false ,navigation}){
         <View style={{flex:0, flexDirection:'row', marginTop:'13%'}}>
             {includeBack && (<Pressable onPress={()=> navigation.goBack()} style={styles.back}><Image source={require('../assets/ChevronLeft.png')} style={{width:35, height:35}}></Image></Pressable>)}
             <View style={[styles.container, ]}>
-                <Image source = {require('../assets/logo2.png')} style= {styles.logo}></Image>
-                <Text style={styles.date}>{formattedDate}</Text>
+                <View style={{flex:0, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+                    <Image source = {require('../assets/logo2.png')} style= {styles.logo}></Image>
+                    <View style={{width:'100%', }}>
+                        <Text style={styles.date}>{formattedDate}</Text>
+                    </View>
+                </View>
             </View>
         </View>
     )
@@ -36,23 +40,21 @@ const styles= StyleSheet.create({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        paddingBottom:'5%'
     },
+
     logo:{
-        width:145,
-        height:145,
-        resizeMode:'contain',
+        width: 120,
+        height: 75,
+        resizeMode: 'contain',
     },
 
     date:{
         fontFamily: 'Poppins_400Regular',
-        position:'absolute',
-        top:70,
-        right:135,
         zIndex:2,
         borderColor:'black',
         borderBottomWidth:1,
         backgroundColor: "transparent",
-        paddingTop: "2.5%",
         fontSize:11,
        
     }
