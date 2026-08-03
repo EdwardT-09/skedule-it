@@ -120,7 +120,7 @@ export default function Subject ({navigation, route}){
             "Your notes have been generated successfully."
         );
     } catch(err){
-        console.log(err);
+        console.log(err.message);
          Alert.alert(
             "Generation Failed",
             "We couldn't generate notes from this document. Please try again."
@@ -147,7 +147,7 @@ export default function Subject ({navigation, route}){
 
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.5-flash",
         contents: [
           {
             role: "user",
@@ -200,7 +200,7 @@ Output ONLY the Markdown notes.
       });
     
     } catch (err) {
-        throw dbError;
+        throw err;
     }
   };
 
@@ -227,7 +227,7 @@ Output ONLY the Markdown notes.
   async function testGemini() {
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.5-flash',
       contents: 'Say hello in one sentence.',
     });
 
