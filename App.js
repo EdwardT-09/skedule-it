@@ -25,7 +25,7 @@ import Schedule from './screens/Schedule.js';
 import AddSchedule from './screens/AddSchedule.js';
 import Subjects from './screens/Subjects.js';
 import Subject from './screens/Subject.js';
-import Performance from './screens/Performance.js';
+import Performance from './screens/StudyLog.js';
 import AddSubject from './screens/AddSubject.js';
 import NotesViewer from './screens/NotesViewer.js';
 import Chat from './screens/Chat.js';

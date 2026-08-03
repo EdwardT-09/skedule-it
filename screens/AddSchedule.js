@@ -16,57 +16,69 @@ import styles from '../assets/style.js';
 import { getAvgConfidenceBySubject, getDurationBySubject, getSessionCountBySubject } from '../util/performanceStats.js';
 
 export default function AddSchedule ({navigation, route}){
+    //store schedule title
     const [subject, setSubject] = useState('');
+
+    //store schedule dates and times
     const [startDate, setStartDate] = useState(new Date());
     const [startTime, setStartTime] = useState(new Date());
     const [endTime, setEndTime] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
+    //store selected schedule color
     const [color, setColor] = useState('');
+
+    //store selected recurring days
     const [days, setDays] = useState([]);
 
+    //store fetched subjects and study logs
     const [subjects, setSubjects] = useState([]);
     const [logs, setLogs] = useState([]);
 
-
+    //toggle between ai and manual 
     const [isAiMode, setIsAiMode] = useState(false);
+
+    //store user's ai prompt
     const [aiPromptInput, setAiPromptInput] = useState('');
+
+    //for loading spinner
     const [isGenerating, setIsGenerating] = useState(false);
 
+    // control visibility of date and time pickers
     const [showStartTime,setShowStartTime] = useState(false);
     const [showEndTime,setShowEndTime] = useState(false);  
     const [showStartDate,setShowStartDate] = useState(false);   
     const [showEndDate,setShowEndDate] = useState(false);   
     
-
+    //store validation error messages
     const [subjectError, setSubjectError] = useState('');
     const [timeError, setTimeError] = useState('');
     const [startDateError, setStartDateError] = useState('');
     const [endDateError, setEndDateError] = useState('');
     const [colorError, setColorError] = useState('');
 
-    
-    // const [startPickerMode, setStartPickerMode] = useState('time');
-    // const [startDatePickerMode, setStartDatePickerMode] = useState('date');
-    // const [endTimePickerMode, setEndTimePickerMode] = useState('time');
-    // const [endPickerMode, setEndPickerMode] = useState('date');
 
-
+    //used for recurring
     const weekDay = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    //obtain from the parameters
     const eventID = route?.params?.scheduleID;
     const method = route?.params?.method;
+
     const {dictionary, loading} = useDictionary();
 
+    //check if user is logged in
     useEffect(()=>{
         isNotLoggedIn(navigation)
     },[])
 
+    //load existing schedule details when editing a schedule event
      useEffect(()=> {
         if(eventID && method == 'Edit'){
             editEvent();
         } 
     }, [eventID])
     
-
+    //retrieve selected schedule from Supabase and populate the fields in the form 
     const editEvent = async() =>{
 
         const user = (await supabase.auth.getUser()).data.user;
@@ -82,13 +94,14 @@ export default function AddSchedule ({navigation, route}){
             .eq('id', eventID)
             .single()
 
-
+        //used to populate fields
         setSubject(data.title)
         setStartDate(new Date(data.start_date))
         setEndDate(new Date(data.end_date))
         setDays(data.recurring)
         setColor(data.color);
 
+        //format the time to show as 12:00 format
         const start = new Date();
         const [startHour, startMinute] = data.start_time.split(':');
 
@@ -105,14 +118,14 @@ export default function AddSchedule ({navigation, route}){
         setEndTime(end);
     }
 
-
-
+    //add or remove a recurring weekday from the selected list
     const toggleDay = (day) =>{
         setDays((prev)=>
             prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
         )
     } 
 
+    //generate a schedule using Gemini
     const handleAIGenerate = async() =>{
         setIsGenerating(true);
         const user = (await supabase.auth.getUser()).data.user;
@@ -140,7 +153,8 @@ export default function AddSchedule ({navigation, route}){
 
         const subjects = await fetchSubjects();
         const logs = await fetchLogs();
-
+        
+        //get the statistics to use in the prompt for adaptable schedule based on learning abilities
         const durationStats = getDurationBySubject(subjects, logs);
         const sessionStats = getSessionCountBySubject(subjects, logs);
         const confidenceStats = getAvgConfidenceBySubject(subjects, logs);
@@ -190,6 +204,7 @@ export default function AddSchedule ({navigation, route}){
             contents:[{role: "user", parts:[{text:prompt}]}],
         });
 
+        //parese generated JSON response
         const responseText = response.text || response.candidate?.[0]?.content?.parts?.[0]?.text;
         const cleanJsonText = responseText.replace(/```json/g, '').replace(/```/g, ''). trim();
         const eventsArray = JSON.parse(cleanJsonText);
@@ -198,7 +213,7 @@ export default function AddSchedule ({navigation, route}){
             user_id: user.id
         }));
 
-
+        //insert into Supabase
         if(Array.isArray(eventsWithUser)){
             const {error:insertError} = await supabase
             .from('schedule_events')
@@ -216,6 +231,7 @@ export default function AddSchedule ({navigation, route}){
     }
     }
 
+    //validate all fields in the form
     const validateFields = () =>{
         const subjectErr = validateSubject(subject, dictionary);
         const timeErr = validateTimes(startTime, endTime, dictionary);
@@ -223,7 +239,7 @@ export default function AddSchedule ({navigation, route}){
         const endDateErr = validateDate(endDate, dictionary);
         const colorErr = validateColor(color, dictionary);
 
-
+        //submit to Supabase if no errors
         if (subjectErr == null && timeErr == null  && startDateErr == null && endDateErr == null && colorErr == null){
             submitEvent();
         } else{
@@ -242,8 +258,7 @@ export default function AddSchedule ({navigation, route}){
 
         if(!user) return;
 
-
-
+        //format dates before saving to Supabase
         const formattedStartDate = startDate.toLocaleDateString('en-CA', {
         timeZone: 'Asia/Kuala_Lumpur'
         })
@@ -251,7 +266,7 @@ export default function AddSchedule ({navigation, route}){
         timeZone: 'Asia/Kuala_Lumpur'
         })
 
-
+        //update existing schedule event
             if(eventID && method === "Edit"){
             const {data, error} = await supabase
                 .from('schedule_events')
@@ -272,6 +287,7 @@ export default function AddSchedule ({navigation, route}){
 
             }
             else{
+            //create new schedule event
             const {data, error} = await supabase
             .from('schedule_events')
             .insert({
@@ -289,7 +305,7 @@ export default function AddSchedule ({navigation, route}){
                 navigation.navigate('Schedule');
             }
     }}
-
+        //retrieve all users' subjects 
         const fetchSubjects = async() =>{
             const user = (await supabase.auth.getUser()).data.user;
     
@@ -307,7 +323,8 @@ export default function AddSchedule ({navigation, route}){
 
             return data;
         }
-    
+        
+        //retrieve all users' study logs
         const fetchLogs = async() =>{
             const user = (await supabase.auth.getUser()).data.user;
     
@@ -316,7 +333,7 @@ export default function AddSchedule ({navigation, route}){
 
     
             const {data, error} = await supabase
-            .from('performance_log')
+            .from('study_logs')
             .select('id, subject, duration, confidence')
             .eq('user_id', user?.id)
             .gte("created_at", startDate.toISOString())

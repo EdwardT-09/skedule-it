@@ -13,11 +13,15 @@ import Nav from '../components/Nav.js';
 import styles from '../assets/style.js';
 
 export default function AddTask ({navigation, route}){
+    //store subject name and subject code
     const [name, setName] = useState('');
     const [subjectCode, setSubjectCode] = useState('');
+
+    //store validation errors
     const [nameError, setNameError] = useState('');
     const [subjectCodeError, setSubjectCodeError] = useState('');
   
+    //get subjects ID if editing an existing subject
     const subjectID = route?.params?.subjectID;
 
     const {dictionary, loading} = useDictionary();
@@ -28,12 +32,14 @@ export default function AddTask ({navigation, route}){
             isNotLoggedIn(navigation)
         },[])
 
+    //if subject id exists, then users can edit the subject details
      useEffect(()=> {
         if(subjectID){
             editSubject();
         } 
     }, [subjectID])
 
+    //retrieve the users' subject from Supabase and populate the fields in the form
     const editSubject = async() =>{
 
         const user = (await supabase.auth.getUser()).data.user;
@@ -50,19 +56,17 @@ export default function AddTask ({navigation, route}){
             .single()
 
         
-
+        //populate the fields
         setName(data.name);
         setSubjectCode(data.subject_code);
     }
 
-    
-
-    
-
+    //validate all form fields before submitting
     const validateFields = () =>{
         const subjectCodeErr = validateSubjectCode(subjectCode, dictionary);
         const nameErr = validateSubject(name, dictionary);
 
+        //if no error, save the subject
         if (subjectCodeErr == null && nameErr == null){
             submitSubject();
         } else{
@@ -73,11 +77,13 @@ export default function AddTask ({navigation, route}){
         }
     }
 
+    //insert or update subject
     const submitSubject = async() => {
         const user = (await supabase.auth.getUser()).data.user;
 
         if(!user) return;
 
+        //update existing subject
         if(subjectID){
         const {error} = await supabase
             .from('subjects')
@@ -94,6 +100,7 @@ export default function AddTask ({navigation, route}){
 
         }
         else{
+        //insert new subject
         const {error} = await supabase
         .from('subjects')
         .insert({

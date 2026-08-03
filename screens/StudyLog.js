@@ -108,7 +108,7 @@ export default function StudyLog ({navigation, route}){
         if(!user) return;
 
         const {error} = await supabase
-        .from('performance_log')
+        .from('study_logs')
         .insert({
             user_id : user?.id,
             subject: selectedSubject,

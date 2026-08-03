@@ -14,7 +14,7 @@ import Header from '../components/Header.js';
 import Navigation from '../components/Nav.js';
 import styles from '../assets/style.js';
 import { copyAsync } from 'expo-file-system/legacy';
-
+import { Alert } from 'react-native';
 
 export default function Subject ({navigation, route}){
     const [menuVisible, setMenuVisible] = useState(false);
@@ -23,6 +23,11 @@ export default function Subject ({navigation, route}){
 
     const [files, setFiles] = useState([]);
 
+    const [generating, setGenerating] = useState(false);
+
+    const [selectedFile, setSelectedFile] = useState();
+    const [fileMenuVisible, setFileMenuVisible] = useState(false);
+
     const {dictionary, loading} = useDictionary();
 
     const subjectID = route?.params?.subjectID;
@@ -30,23 +35,42 @@ export default function Subject ({navigation, route}){
     useEffect(() => {getSubject(); getFiles();isNotLoggedIn(navigation)}, []);
     
     const deleteSubject = async(selectedSubject) =>{
-                const user = (await supabase.auth.getUser()).data.user;
-        
-                if(!user) return;
-        
-                const {error} = await supabase
-                .from('subjects')
-                .delete()
-                .eq('id', selectedSubject)
-        
-                if(error){
-                    console.log(error);
-                } else{ 
-                    getSubject();
-                    setMenuVisible(false);
-                    navigation.navigate('Subjects')
-                }
+            const user = (await supabase.auth.getUser()).data.user;
+
+            if(!user) return;
+
+            const {error} = await supabase
+            .from('subjects')
+            .delete()
+            .eq('id', selectedSubject)
+
+            if(error){
+                console.log(error);
+            } else{ 
+                getSubject();
+                setMenuVisible(false);
+                navigation.navigate('Subjects')
             }
+        }
+
+        const deleteFile = async(selectedFile) =>{
+            const user = (await supabase.auth.getUser()).data.user;
+
+            if(!user) return;
+
+            const {error} = await supabase
+            .from('notes')
+            .delete()
+            .eq('id', selectedFile.id)
+
+            if(error){
+                console.log(error);
+            } else{ 
+                await getFiles();
+                getSubject();
+                setFileMenuVisible(false);
+            }
+    }
 
     const getSubject = async() => {
         const user = (await supabase.auth.getUser()).data.user;
@@ -77,9 +101,34 @@ export default function Subject ({navigation, route}){
         //if user did not pick any file (press cancel), return
         if (result.canceled) return;
 
+        const file = result.assets[0];
+
+        if (file.mimeType !== "application/pdf") {
+            Alert.alert("Invalid File", "Please select a PDF document.");
+            return;
+        }
+
+        setGenerating(true);
+
+        try{
         for (const file of result.assets){
             await uploadToDatabase(file);
         }
+        await getFiles();
+        Alert.alert(
+            "Success",
+            "Your notes have been generated successfully."
+        );
+    } catch(err){
+        console.log(err);
+         Alert.alert(
+            "Generation Failed",
+            "We couldn't generate notes from this document. Please try again."
+        );
+    }
+    finally{
+        setGenerating(false)
+    }
         
     }
 
@@ -90,19 +139,6 @@ export default function Subject ({navigation, route}){
       const user = (await supabase.auth.getUser()).data.user;
 
       const fileName = `${user.id}/${subjectID}/${Date.now()}-${file.name}`;
-
-
-      const { error: uploadError } = await supabase.storage
-        .from("subjectFiles")
-        .upload(fileName, {
-          uri: file.uri,
-          name: fileName,
-          type: file.mimeType,
-        });
-
-      if (uploadError) {
-        return;
-      }
 
 
       const base64 = await FileSystem.readAsStringAsync(file.uri, {
@@ -159,12 +195,12 @@ Output ONLY the Markdown notes.
 
       const { error: dbError } = await supabase.from("notes").insert({
         subject_id: subjectID,
-        file_name: fileName,
+        file_name: file.name,
         content: notes,
       });
     
     } catch (err) {
-      return
+        throw dbError;
     }
   };
 
@@ -175,19 +211,17 @@ Output ONLY the Markdown notes.
 
         if (!user) return;
 
-        const { data, error } = await supabase.storage
-        .from("subjectFiles")
-        .list(`${user.id}/${subjectID}`, {
-                limit: 100,
-                offset: 0,
-        });
+        const { data, error } = await supabase
+                .from("notes")
+                .select("id, file_name, content")
+                .eq("subject_id", subjectID);
 
+            if(error){
+                console.log(error);
+                return;
+            }
 
-        if (error){
-            return;
-        }
-
-        setFiles(data);
+            setFiles(data);
     }
 
   async function testGemini() {
@@ -229,21 +263,32 @@ Output ONLY the Markdown notes.
                             <Text style={styles.title}>{subjectCode} - {name}</Text>
                         </View>
                         <View style={{flex:0, flexDirection:'row', alignSelf:'flex-end'}}>
-                            <Pressable onPress={()=> {uploadDocument()}}>
-                                <Image source={require('../assets/Plus.png')} style={{width:50, height:50, padding:'8%', resizeMode:'contain'}}></Image>
+                            <Pressable   disabled={generating} onPress={()=> {uploadDocument()}}>
+                                {generating ? (
+                                        <ActivityIndicator color="black" />
+                                    ) : (
+                                        <Image source={require("../assets/Plus.png")} style={{ width: 35, height:35, resizeMode: "contain" }}/>
+                                    )}
                             </Pressable>
                             <Pressable onPress={() => {setMenuVisible(true)}}>
-                                <Image source={require('../assets/Menu.png')} style={{width:20, height:20, padding:'5%', resizeMode:'contain'}}></Image>
+                                <Image source={require('../assets/Menu.png')} style={{width:35, height:35, paddingRight:'8%', resizeMode:'contain'}}></Image>
                             </Pressable>
                         </View>
                     </View>
                     <View>
                         <ScrollView style={{height:'65%'}}>
                             {files.map((file)=>(
-                                <Pressable key={file.name} style={styles.listItems} onPress={()=> navigation.navigate('NotesViewer', {fileName: file.name, subjectID: subjectID})}>
-                                    <Text style={styles.fileTitle}>{file.name.split('-').slice(1).join('-').substring(0, file.name.split('-').slice(1).join('-').lastIndexOf('.'))}</Text>
-                                    <Text style={styles.subtitle}>{roundUpToDecimal(file.metadata.size/1024, 2)}kb</Text>
+                                <Pressable key={file.id} style={styles.listItems} onPress={()=> navigation.navigate('NotesViewer', {fileID: file.id, content:file.content})}>
+                                    <View style={{flex:0, flexDirection:'row', justifyContent:'center', alignItems:'center'}}>  
+                                        <View style={{width:'85%'}}>
+                                            <Text style={styles.fileTitle}>{file.file_name}</Text>
+                                        </View>
+                                        <Pressable onPress={()=>{setSelectedFile(file); setFileMenuVisible(true)}}>
+                                                <Image source={require('../assets/Menu.png')} style={{width:35, height:35, paddingRight:'8%', resizeMode:'contain'}}></Image>
+                                        </Pressable>
+                                    </View>
                                 </Pressable>
+
                             )
                         )}
                         </ScrollView>
@@ -260,6 +305,19 @@ Output ONLY the Markdown notes.
                                 <Text style={styles.modalMenuLabels}>{dictionary.edit}</Text>
                             </Pressable>
                             <Pressable onPress= {()=> deleteSubject(subjectID)} style={({pressed})=> ([styles.modalMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
+                                <Image source={require('../assets/Trash.png')} style={styles.modalMenuImage}></Image>
+                                <Text style={[styles.modalMenuLabels, {color:'#c14343'}]}>{dictionary.delete}</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </Modal>
+                <Modal style={{justifyContent: 'flex-end', margin:0}} transparent={true} isVisible={fileMenuVisible} swipeDirection="down" onSwipeComplete={()=> setFileMenuVisible(false)} onBackdropPress={()=> setFileMenuVisible(false)} propagateSwipe={true}>
+                    <View style={[styles.modalMenuContainer]}>
+                        <Pressable onPress={()=>{setFileMenuVisible(false)}}>
+                            <Image source={require('../assets/close.png')} style={{ flex:0, justifyContent:'center', alignSelf:'flex-end'}}></Image>
+                        </Pressable>
+                        <View>
+                            <Pressable onPress= {()=> deleteFile(selectedFile)} style={({pressed})=> ([styles.modalMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
                                 <Image source={require('../assets/Trash.png')} style={styles.modalMenuImage}></Image>
                                 <Text style={[styles.modalMenuLabels, {color:'#c14343'}]}>{dictionary.delete}</Text>
                             </Pressable>

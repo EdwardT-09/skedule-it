@@ -11,12 +11,16 @@ import { isNotLoggedIn } from '../util/common.js';
 
 export default function Languages({navigation}){
     const {dictionary, loading, refreshDictionary} = useDictionary();
+
+    //store users' language preference
     const [isLanguage, setIsLanguage] = useState('en');
     
     //if user not logged in, then navigate to landing page
     useEffect(()=>{
             isNotLoggedIn(navigation)
         },[])
+
+    //update users' language preference to Supabase
     const saveLanguage  = async(lang) => {
         const user = (await supabase.auth.getUser()).data.user;
     
@@ -33,7 +37,8 @@ export default function Languages({navigation}){
         refreshDictionary();
         navigation.navigate('Profile');
     }
-
+    
+    //display loading spinner while dictionary data is being retrieved
     if(loading){
         return(
             <View style={{flex:1}}>

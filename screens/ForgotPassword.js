@@ -10,14 +10,18 @@ import * as Linking from "expo-linking";
 import { validateEmail } from "../util/validation.js";
 
 export default function ForgotPassword({navigation}){
+    //store the user's email address
     const [email,setEmail] = useState("");
 
+    //store the email validation error
     const [emailError, setEmailError] = useState("");
 
     const {dictionary, loading} = useDictionary();
+
+    //deep link used for password reset
     const redirectTo = "skeduleit://reset-password";  
 
-
+    //send a password reset email using Supabase
     const sendResetEmail = async()=>{
         const {error} = await supabase.auth.resetPasswordForEmail(email.trim(), {
             redirectTo: "skeduleit://reset-password",
@@ -28,7 +32,7 @@ export default function ForgotPassword({navigation}){
             throw error;
         }
     }
-
+    //validate the email address and send the reset email
     const handleEmail = async () => {
 
         const emailErr = validateEmail(email, dictionary);
@@ -46,7 +50,7 @@ export default function ForgotPassword({navigation}){
         }
     }
 
-
+    //display a loading spinner while the dictionary is being loaded
     if(loading){
             return(
                 <View style={{flex:1}}>

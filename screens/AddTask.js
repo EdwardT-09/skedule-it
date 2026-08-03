@@ -16,19 +16,28 @@ import styles from '../assets/style.js';
 
 
 export default function AddTask ({navigation, route}){
+    //store task title
     const [title, setTitle] = useState('');
 
+    //store task start and end date
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
+
+    //store deadline boolean
     const [hasDeadline, setHasDeadline] = useState(false);
+    
+    //date picker settings
     const [mode, setMode] = useState('date');
-    const [show,setShow] = useState(false);
+    const [showStartDate,setShowStartDate] = useState(false);
+    const [showEndDate,setShowEndDate] = useState(false);
 
-
+    //store selected recurring days
     const [days, setDays] = useState([]);
+
+    //store priority
     const [priority, setPriority] = useState('Q4');
 
-
+    //validation error messages
     const [titleError, setTitleError] = useState('');
     const [startDateError, setStartDateError] = useState('');
     const [EndDateError, setEndDateError] = useState('');
@@ -37,15 +46,19 @@ export default function AddTask ({navigation, route}){
     //used to determine whether the priority tip popup is open or closed
     const [tips, setTips] = useState(false);
 
+    //store subtask level
     const [level, setLevel] = useState();
 
+    //days displayed for recurrin tasks
     const weekDay = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+    //paranters passed from previous screens
     const taskID = route?.params?.taskID;
     const method = route?.params?.method;
 
     const {dictionary, loading} = useDictionary();
 
+    //store the maximum level of subtasks
     const MAX_LEVEL = 2;
 
     //if user not logged in, then navigate to landing page
@@ -53,7 +66,7 @@ export default function AddTask ({navigation, route}){
         isNotLoggedIn(navigation)
     },[])
 
-
+    //determine if user is adding new subtasks or editing task
      useEffect(()=> {
         if(taskID && method == 'Edit'){
             editTask();
@@ -62,6 +75,7 @@ export default function AddTask ({navigation, route}){
         }
     }, [taskID])
 
+    //retrieve task details from Supabase to populate the form
     const editTask = async() =>{
 
         const user = (await supabase.auth.getUser()).data.user;
@@ -76,10 +90,8 @@ export default function AddTask ({navigation, route}){
             .eq('user_id', user.id)
             .eq('id', taskID)
             .single()
-
         
-
-
+        //populate the fields in a form
         setTitle(data.title);
         setStartDate(new Date(data.start_date));
         setEndDate(new Date(data.end_date));
@@ -88,7 +100,7 @@ export default function AddTask ({navigation, route}){
         setPriority(data.priority);
     }
 
-
+    //retrieve the parent task level before creating a subtask
     const addSubTask = async() => {
         const user = (await supabase.auth.getUser()).data.user;
 
@@ -103,7 +115,7 @@ export default function AddTask ({navigation, route}){
             .eq('id', taskID)
             .single()
 
-
+            //prevent exceeding the maximum level of subtasks
             if (data.level >= MAX_LEVEL){
                 Alert.alert(dictionary.max_depth);
                 navigation.goBack();
@@ -114,26 +126,30 @@ export default function AddTask ({navigation, route}){
         setLevel(data.level);
     }
 
-
+    //add or remove recurring days
     const toggleDay = (day) =>{
         setDays((prev)=>
             prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
         )
     } 
 
+    //display the date picker
     const showMode = (currentMode) =>{
         setShow(true);
         setMode(currentMode);
     }
 
+    //show date picker as date mode
     const showDatePicker = () =>{
         showMode('date');
     }
 
+    //show how to use priority popup
     const showPriorityTip = () =>{
         setTips(true);
     }
 
+    //validate the users' inputs
     const validateFields = () =>{
         const titleErr = validateTitle(title, dictionary);
         const startDateErr = validateDate(startDate, dictionary);
@@ -150,66 +166,49 @@ export default function AddTask ({navigation, route}){
         }
     }
 
+    //insert or update task or subtasks
     const submitTask = async() => {
         const user = (await supabase.auth.getUser()).data.user;
 
         if(!user) return;
-     
-            const formattedStartDate = startDate.toLocaleDateString('en-CA', {
-        timeZone: 'Asia/Kuala_Lumpur'
-        })
-
-            const formattedEndDate = endDate.toLocaleDateString('en-CA', {
-        timeZone: 'Asia/Kuala_Lumpur'
-        })
-
         
-            if(taskID && method === "Edit"){
-            const {data, error} = await supabase
-                .from('tasks')
-                .update({
-                    user_id : user?.id,
-                    title : title,
-                    start_date: formattedStartDate,
-                    has_deadline: hasDeadline,
-                    end_date: formattedEndDate,
-                    recurring: days,
-                    priority: priority,
-                })
-                .eq('id', taskID)
-            
-            if(!error){
-                navigation.navigate('Tasks');
-            }
+        //format dates before saving
+        const formattedStartDate = startDate.toLocaleDateString('en-CA', {
+        timeZone: 'Asia/Kuala_Lumpur'
+        })
 
-            }else if (taskID && method === "Add Subtask") {
-            if (level >= MAX_LEVEL){
-                Alert.alert(dictionary.max_depth);
-                navigation.goBack();
-                return;
-            }
+        const formattedEndDate = endDate.toLocaleDateString('en-CA', {
+        timeZone: 'Asia/Kuala_Lumpur'
+        })
 
-            const {data, error} = await supabase
-                .from('tasks')
-                .insert({
-                    user_id : user?.id,
-                    title : title,
-                    start_date: formattedStartDate,
-                    has_deadline: hasDeadline,
-                    end_date: formattedEndDate,
-                    recurring: days,
-                    priority: priority,
-                    parent_key: taskID,
-                    level: level + 1, 
-                  
+        //edit task or subtask
+        if(taskID && method === "Edit"){
+        const {data, error} = await supabase
+            .from('tasks')
+            .update({
+                user_id : user?.id,
+                title : title,
+                start_date: formattedStartDate,
+                has_deadline: hasDeadline,
+                end_date: formattedEndDate,
+                recurring: days,
+                priority: priority,
             })
-
-            if(!error){
-                navigation.navigate('Tasks');
-            }
+            .eq('id', taskID)
+        
+        if(!error){
+            navigation.navigate('Tasks');
         }
-            else{
-            const {data, error} = await supabase
+
+        }else if (taskID && method === "Add Subtask") {
+        if (level >= MAX_LEVEL){
+            Alert.alert(dictionary.max_depth);
+            navigation.goBack();
+            return;
+        }
+
+        //insert new task or subtasks
+        const {data, error} = await supabase
             .from('tasks')
             .insert({
                 user_id : user?.id,
@@ -219,18 +218,37 @@ export default function AddTask ({navigation, route}){
                 end_date: formattedEndDate,
                 recurring: days,
                 priority: priority,
-                parent_key:null,
-                level: 0,
-            })
+                parent_key: taskID,
+                level: level + 1, 
+                
+        })
 
-            if(!error){
-                navigation.navigate('Tasks');
-            }}
+        if(!error){
+            navigation.navigate('Tasks');
+        }
+    }
+        else{
+        const {data, error} = await supabase
+        .from('tasks')
+        .insert({
+            user_id : user?.id,
+            title : title,
+            start_date: formattedStartDate,
+            has_deadline: hasDeadline,
+            end_date: formattedEndDate,
+            recurring: days,
+            priority: priority,
+            parent_key:null,
+            level: 0,
+        })
 
-
-        
+        if(!error){
+            navigation.navigate('Tasks');
+        }}
+    
     }
 
+    //show loading spinner while dictionary data is being retrieved
     if(loading){
         return(
             <View style={{flex:1}}>
@@ -267,13 +285,13 @@ export default function AddTask ({navigation, route}){
                                     </View>
                                     <View style={styles.fields}>
                                         <Text style={styles.fieldLabels}>{dictionary.start_date}:</Text>
-                                        <Pressable style={{backgroundColor:'transparent'}} onPress={showDatePicker} ><View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}><Text>{startDate.getDate()}/{startDate.getMonth() + 1}/{startDate.getFullYear()}</Text></View></Pressable>
-                                        {show && (
+                                        <Pressable style={{backgroundColor:'transparent'}} onPress={()=>setShowStartDate(true)} ><View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}><Text>{startDate.getDate()}/{startDate.getMonth() + 1}/{startDate.getFullYear()}</Text></View></Pressable>
+                                        {showStartDate && (
                                         <DateTimePicker
                                         value={startDate}
                                         mode={mode}
                                         is24Hour={true}
-                                        onChange={(event, selectedDate) => {setStartDate(selectedDate); setShow(false)}}
+                                        onChange={(event, selectedDate) => {setStartDate(selectedDate); setShowStartDate(false)}}
                                         />
                                     )}
                                     {startDateError ? (<Text style={styles.errorText}>{startDateError}</Text>) : null}
@@ -294,13 +312,13 @@ export default function AddTask ({navigation, route}){
                                     </View>
                                     {hasDeadline && (<View style={styles.fields}>
                                         <Text style={styles.fieldLabels}>{dictionary.end_date}:</Text>
-                                        <Pressable style={{backgroundColor:'transparent'}} onPress={showDatePicker} ><View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}><Text>{endDate.getDate()}/{endDate.getMonth() + 1}/{endDate.getFullYear()}</Text></View></Pressable>
-                                        {show && (
+                                        <Pressable style={{backgroundColor:'transparent'}} onPress={()=>setShowEndDate(true)} ><View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}><Text>{endDate.getDate()}/{endDate.getMonth() + 1}/{endDate.getFullYear()}</Text></View></Pressable>
+                                        {showEndDate && (
                                         <DateTimePicker
                                         value={endDate}
                                         mode={mode}
                                         is24Hour={true}
-                                        onChange={(event, selectedDate) => {setEndDate(selectedDate); setShow(false)}}
+                                        onChange={(event, selectedDate) => {setEndDate(selectedDate); setShowEndDate(false)}}
                                         />
                                     )}
                                     {/* {endDateError ? (<Text style={styles.errorText}>{dateError}</Text>) : null} */}

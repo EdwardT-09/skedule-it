@@ -11,11 +11,14 @@ import Navigation from '../components/Nav.js';
 import styles from '../assets/style.js';
 import { isNotLoggedIn } from '../util/common.js';
 
+
 export default function Password({navigation}){
+    //store password inputs
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
+    //store validation error messages
     const [currentPasswordError, setCurrentPasswordError] = useState('');
     const [newPasswordError, setNewPasswordError] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
@@ -27,6 +30,7 @@ export default function Password({navigation}){
             isNotLoggedIn(navigation)
         },[])
 
+    //validate password fields, verify the current password and update the user's password in Supabase
     const changePassword = async() => {
                 
         const user = (await supabase.auth.getUser()).data.user;
@@ -43,19 +47,19 @@ export default function Password({navigation}){
 
 
         if(currentPasswordErr === null && newPasswordErr === null && confirmPasswordErr === null){
-
+        //verify the user's current password
         const {data, error} = await supabase.auth.signInWithPassword({
             email: user.email,
             password: currentPassword,
         })
 
             if(data){
-
                     const {data, error} = await supabase.auth.updateUser({
                         password : confirmPassword
                     })
 
                 } else {
+                    //display error if the current password is incorrect
                     setCurrentPasswordError('The current password provided is incorrect.', error);
                 }
         }

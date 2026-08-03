@@ -12,6 +12,7 @@ export default function Landing({ navigation }) {
 
     useEffect(()=> {isLoggedIn(navigation)}, []);
 
+    //display loading spinner while dictionary data is being retrieved
     if(loading){
         return(
             <View style={{flex:1}}>

@@ -92,10 +92,10 @@ console.log("Upcoming Tasks:", upcomingTasks);
                                                 color={isDone ? '#4CAF50' : undefined}
                                                 style={{marginRight: '5%'}}
                                             />
-                                        <View style={{flex:0, flexDirection:'column'}}>
+                                        <View style={{flex:0, flexDirection:'column', }}>
                                             <Text style={[styles.taskTitle,  isDueToday && {color:'red'}, isDone && {
                                                             textDecorationLine:'line-through', color: 'gray'
-                                                        }, ]}>{task.title}</Text>
+                                                        },{width:'90%'} ]}>{task.title}</Text>
                                             <Text style={[styles.taskInfo, ]}>{task.start_date} {task.recurring?.length > 0 ? '(' + dictionary.recurring + ')'  : ''} </Text>
                                         </View>
                                         </View>

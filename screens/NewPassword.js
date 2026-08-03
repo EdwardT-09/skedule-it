@@ -12,25 +12,25 @@ import styles from '../assets/style.js';
 
 
 export default function Password({navigation}){
+    //store password and confirm password inputs
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
+    //store password and confirm password validation errors
     const [newPasswordError, setNewPasswordError] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
     const {dictionary, loading} = useDictionary();
 
-
+    //update password
     const changePassword = async() => {
                 
         const user = (await supabase.auth.getUser()).data.user;
 
         if(!user) return;
 
-
         const newPasswordErr =  validatePassword(newPassword, dictionary);
         const confirmPasswordErr =  validatePassword2(newPassword, confirmPassword, dictionary);
-
 
         setNewPasswordError(newPasswordErr);
         setConfirmPasswordError(confirmPasswordErr);
@@ -48,7 +48,8 @@ export default function Password({navigation}){
         }
         
     }
-
+    
+    //display loading spinner while dictionary data is being retrieved
     if(loading){
         return(
             <View style={{flex:1}}>

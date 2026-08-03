@@ -16,27 +16,41 @@ import Checkbox from 'expo-checkbox';
 
 
 export default function Home({navigation}){
+    //colors used for chart visualization
     const colors = ["#CDF5E9", "#9FD8C3", "#D8B84C", "#7FA8C9", "#C98FA5", "#404040"];
 
+    //store user profile information
     const [username, setUsername] = useState();
+
+    //store currently selected tasks
     const [selectedTask, setSelectedTask] = useState();
+
+    //store subjects and study logs
     const [subjects, setSubjects] = useState([]);
     const [logs, setLogs] = useState([]);
+
+    //store statistic data
     const [durationChart, setDurationChart] = useState([]);
     const [sessionChart, setSessionChart] = useState([]);
     const [avgConfChart, setAvgConfChart] = useState([]);
+
+    //indicate whether chart have sufficient data
     const [chartReady, setChartReady] = useState(false);
+
+    //store tasks due today
     const [dueTodayTasks, setDueTodayTasks] = useState([]);
+
+    //control whether the deadline reminder popup is displayed
     const [deadlineModalVisible, setDeadlineModalVisible] = useState(false);
 
     const {dictionary, loading} = useDictionary();
+    
+    //current date 
     const today = new Date().toLocaleDateString('en-CA', {
         timeZone: 'Asia/Kuala_Lumpur'
     });
 
-
-
-                                        
+    //load dashboard data when the screen opens and verify user is loggedin                              
     useEffect(()=>{
         fetchUser();
         fetchSubjects();
@@ -44,6 +58,7 @@ export default function Home({navigation}){
         isNotLoggedIn(navigation);
     },[])
 
+    //generate chart data whenever subjects or study logs are updated
     useEffect(()=>{
         if(!subjects.length || !logs.length ) return;
 
@@ -51,18 +66,21 @@ export default function Home({navigation}){
         const sessionStats = getSessionCountBySubject(subjects, logs);
         const averageConfStats = getAvgConfidenceBySubject(subjects,logs);
 
+        //build study duration chart
         const newDurationChart = Object.values(durationStats).map((item, index)=>({
             value:item.totalDuration,
             color: colors[index % colors.length],
             text:`${item.subject_code} - ${item.totalDuration}`,
         }))
         
+        //build session count chart
         const newSessionChart=Object.values(sessionStats).map((item, index)=> ({
             value: item.sessions,
             color: colors[index % colors.length],
             label: item.subject_code,
         }))
 
+        //build average confidence chart
         const newAvgConfChart = Object.values(averageConfStats).map((item, index)=> ({
             value: item.avgConfidence,
             color: colors[index % colors.length],
@@ -73,6 +91,7 @@ export default function Home({navigation}){
         setSessionChart(newSessionChart);
         setAvgConfChart(newAvgConfChart);
 
+        //enable charts if data exists
         setChartReady(
             newDurationChart.length > 0 && newSessionChart.length > 0 && newAvgConfChart.length > 0
         )
@@ -89,6 +108,7 @@ export default function Home({navigation}){
         toggleTaskCompletion,
     } = useTask();
 
+    //filter tasks that are due today but not completed
     useEffect(() =>{
     const todayStr = new Date().toLocaleDateString('en-CA', {
         timeZone: 'Asia/Kuala_Lumpur',
@@ -102,10 +122,12 @@ export default function Home({navigation}){
         setDueTodayTasks(filtered);
     }, [todayTasks])
 
+    //show deadline reminder whenever there are unfinished tasks due today
     useEffect(()=>{
         setDeadlineModalVisible(dueTodayTasks.length > 0);
     }, [dueTodayTasks])
 
+    //retrieve the user's profile information specifically the username
     async function fetchUser(){
 
         const {
@@ -127,6 +149,7 @@ export default function Home({navigation}){
 
     }
 
+    //retrive all subjects belonging to the current user
     const fetchSubjects = async() =>{
         const user = (await supabase.auth.getUser()).data.user;
 
@@ -143,6 +166,7 @@ export default function Home({navigation}){
         }
     }
 
+    //retrieve study logs from the past two months
     const fetchLogs = async() =>{
         const user = (await supabase.auth.getUser()).data.user;
 
@@ -152,7 +176,7 @@ export default function Home({navigation}){
         twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2)
 
         const {data, error} = await supabase
-        .from('performance_log')
+        .from('study_logs')
         .select('id, subject, duration, confidence')
         .eq('user_id', user?.id)
         .gte("created_at", twoMonthsAgo.toISOString());
@@ -164,7 +188,7 @@ export default function Home({navigation}){
 
     }
 
-
+    //display a loading spinner while dictionary data is being retrieved
     if(loading){
         return(
             <View style={{flex:1}}>

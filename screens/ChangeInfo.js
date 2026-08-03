@@ -20,12 +20,15 @@ export default function ChangeInfo({navigation}){
 
     const {dictionary, loading} = useDictionary();
 
+    //store user profile information
     const [username, setUsername] = useState('');
     const [gender, setGender] = useState('');
 
+    //store user profile validation error
     const [usernameError, setUsernameError] = useState('');
     const [genderError, setGenderError] = useState('');
 
+    //retrieve the current user's profile details from Supabase and populate the form
     const getDetails = async() =>{
            const user = (await supabase.auth.getUser()).data.user;
         
@@ -45,6 +48,7 @@ export default function ChangeInfo({navigation}){
         
     }
 
+    //validate the input fields and update
     const updateDetails = async()=> {
         const user = (await supabase.auth.getUser()).data.user;
     
@@ -69,7 +73,7 @@ export default function ChangeInfo({navigation}){
                 }
             }};
 
-          
+    //display a loading spinner while the dictionary data is being retrieved   
     if(loading){
         return(
             <View style={{flex:1}}>

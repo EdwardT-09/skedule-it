@@ -9,39 +9,33 @@ import Header from '../components/Header';
 import styles from '../assets/style';
 
 export default function Chat({navigation, route}) {
-    const fileName = route?.params?.fileName;
-    const subjectID = route?.params?.subjectID;
+    const notesFromParam = route?.params?.content;
 
+    //store the chat convo
     const [messages, setMessages] = useState([]);
+
+    //store the users current question//prompt 
     const [question, setQuestion] = useState('');
+
+    //controls the loading spinner
     const [loading, setLoading] = useState(false);
 
-    const [notes, setNotes] = useState('');
+    //store the notes retrieved from Supabase
+    const [notes, setNotes] = useState(notesFromParam || '');
 
-    
-    useEffect(()=> {getNotes(),  isNotLoggedIn(navigation)}, [])
+    //fetch the notes and verify user is logged in
+    useEffect(()=> {
+    isNotLoggedIn(navigation)}, [])
 
-    const getNotes = async() =>{
 
-        const user = (await supabase.auth.getUser()).data.user;
-        
-        if(!user) return;
 
-        
-        const {data, error} = await supabase
-        .from('notes')
-        .select('content')
-        .eq('file_name', `${user.id}/${subjectID}/${fileName}`)
-        .single()
-        
-        setNotes(data.content);
-    }
-
+    // send the question to Gemini and respond based on the notes only
     const askAI = async() => {
         if(!question.trim()) return;
 
         const userQuestion = question;
-        
+
+        //add user's message to the chat
         setMessages(prev =>[
             ...prev,
             {
@@ -62,7 +56,7 @@ export default function Chat({navigation, route}) {
                     parts: [
                       {
                        text: 
-                       `You are a lecturer. Use only these notes to answer in a simple, easy to understand manner:
+                       `Use only these notes to answer in a simple, easy to understand manner:
                        RULES: Do not use markdown formatting.
                         Do not use *, **, #, backticks, or bullet symbols.
                         Reply in plain text.
@@ -76,7 +70,7 @@ export default function Chat({navigation, route}) {
             const answer = result.candidates?.[0]?.content?.parts?.[0]?.text;
    
 
-
+            //add Gemini's response to the chat
             setMessages(prev =>[
                 ...prev,
                 {
@@ -87,7 +81,7 @@ export default function Chat({navigation, route}) {
         } catch(err){
 
             const errorMessage = err?.message || "sorry! it seems that something went wrong while generating a response";
-
+            // if have error, add to message
             setMessages(prev =>[
                 ...prev,
                 {
@@ -102,8 +96,8 @@ export default function Chat({navigation, route}) {
 
   return (
     <View style={{ flex: 1 }}>
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={0} >
             <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={0} >
                 <Header includeBack navigation={navigation} />
                 <ScrollView style={{flex:1}} contentContainerStyle={{padding:15}}>
                     {messages.map((msg, index) => (
@@ -122,8 +116,10 @@ export default function Chat({navigation, route}) {
                     </Pressable>
                     <Text>powered by gemini</Text>
                 </View>
+                </KeyboardAvoidingView>
             </LinearGradient>
-        </KeyboardAvoidingView>
+
     </View>
+
   );
 }

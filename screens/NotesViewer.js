@@ -12,32 +12,16 @@ import { isNotLoggedIn } from '../util/common.js';
 
 
 export default function NotesViewer ({navigation, route}){
-    const fileName = route?.params?.fileName;
-    const subjectID = route?.params?.subjectID;
-    const [notes, setNotes] = useState('');
+    const fileID = route?.params?.fileID;
+    const content = route?.params?.content;
+
+    //store notes
+    const [notes, setNotes] = useState(content || '');
 
 
     useEffect(()=> {
-        loadNotes();
         isNotLoggedIn(navigation)
     }, [])
-
-    const loadNotes = async() => {
-
-        const user = (await supabase.auth.getUser()).data.user;
-
-        if(!user) return;
-
-        const {data, error} = await supabase
-        .from('notes')
-        .select('content')
-        .eq('file_name', `${user.id}/${subjectID}/${fileName}`)
-        .single()
-
-
-        setNotes(data.content);
-    }
-
        
 
     return(
@@ -49,7 +33,7 @@ export default function NotesViewer ({navigation, route}){
                         <Markdown style={{marginBottom:'5%'}}>{notes}</Markdown>
                     </View>
                 </ScrollView>
-                <Pressable onPress={() => navigation.navigate('Chat', { fileName :fileName, subjectID : subjectID})} style={{backgroundColor:'#1e1e1e', padding: 15, borderRadius: 50, marginTop: 20, width:65, height:65,  position: 'absolute', bottom:80, right:40, flex:0, alignItems:'center', justifyContent:'center'}}>
+                <Pressable onPress={() => navigation.navigate('Chat', { fileID :fileID, content : notes})} style={{backgroundColor:'#1e1e1e', padding: 15, borderRadius: 50, marginTop: 20, width:65, height:65,  position: 'absolute', bottom:80, right:40, flex:0, alignItems:'center', justifyContent:'center'}}>
                    <Image source={require('../assets/Chat.png')}/> 
                 </Pressable>
             </LinearGradient>
