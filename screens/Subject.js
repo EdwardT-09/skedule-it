@@ -160,26 +160,26 @@ export default function Subject ({navigation, route}){
               },
               {
                text: `
-Convert this PDF into study notes in Markdown format.
+                    Convert this PDF into study notes in Markdown format.
 
-Rules:
-- Start immediately with the first heading (## ...)
-- Do NOT write any introduction
-- Do NOT write phrases like:
-  - "Here are the notes"
-  - "Based on the PDF"
-  - "Designed for clarity and easy learning"
-- Do NOT add any text before the first heading
-- Do NOT add any concluding remarks outside the notes
-- Use:
-  - ## for main sections
-  - ### for subsections
-  - Bullet points for key facts
-  - Code blocks when relevant
-- End with a ## Summary section
-
-Output ONLY the Markdown notes.
-`,
+                    Rules:
+                    - Start immediately with the first heading (## ...)
+                    - Do NOT write any introduction
+                    - Do NOT write phrases like:
+                    - "Here are the notes"
+                    - "Based on the PDF"
+                    - "Designed for clarity and easy learning"
+                    - Do NOT add any text before the first heading
+                    - Do NOT add any concluding remarks outside the notes
+                    - Use:
+                    - ## for main sections
+                    - ### for subsections
+                    - Bullet points for key facts
+                    - Code blocks when relevant
+                    - End with a ## Summary section
+                    - Limit the output to around 2000 words maximum.
+                    Output ONLY the Markdown notes.
+                    `,
               },
             ],
           },
@@ -193,11 +193,17 @@ Output ONLY the Markdown notes.
 
 
 
-      const { error: dbError } = await supabase.from("notes").insert({
+      const { error: dbError } = await supabase.from("notes")
+      .insert({
         subject_id: subjectID,
         file_name: file.name,
         content: notes,
       });
+
+      if (dbError) {
+        console.log("Insert error:", dbError);
+        throw dbError;
+        }
     
     } catch (err) {
         throw err;
