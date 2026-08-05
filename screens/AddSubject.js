@@ -12,7 +12,7 @@ import Header from '../components/Header.js';
 import Nav from '../components/Nav.js';
 import styles from '../assets/style.js';
 
-export default function AddTask ({navigation, route}){
+export default function AddSubject ({navigation, route}){
     //store subject name and subject code
     const [name, setName] = useState('');
     const [subjectCode, setSubjectCode] = useState('');
