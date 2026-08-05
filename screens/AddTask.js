@@ -133,11 +133,6 @@ export default function AddTask ({navigation, route}){
         )
     } 
 
-    //display the date picker
-    const showMode = (currentMode) =>{
-        setShow(true);
-        setMode(currentMode);
-    }
 
     //show date picker as date mode
     const showDatePicker = () =>{
