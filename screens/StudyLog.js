@@ -60,29 +60,6 @@ export default function StudyLog ({navigation, route}){
         setSubjects(data);
     }
 
-    const editSubject = async() =>{
-
-        const user = (await supabase.auth.getUser()).data.user;
-
-        if(!user) return;
- 
-        const {data, error} = await supabase
-            .from('subjects')
-            .select(
-                'name, subject_code'
-            )
-            .eq('user_id', user.id)
-            .eq('id', subjectID)
-            .single()
-
-        
-
-
-        setName(data.name);
-  
-    }
-
-    
 
     
 
@@ -92,7 +69,7 @@ export default function StudyLog ({navigation, route}){
         const confidenceErr = validateConfidence(confidence, dictionary);
 
         if (subjectErr == null && durationErr == null && confidenceErr == null ){
-            submitSubject();
+            submitLog();
         } else{
             setSubjectError(subjectErr);
             setDurationError(durationErr);
@@ -102,7 +79,7 @@ export default function StudyLog ({navigation, route}){
         }
     }
 
-    const submitSubject = async() => {
+    const submitLog = async() => {
         const user = (await supabase.auth.getUser()).data.user;
 
         if(!user) return;
