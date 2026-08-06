@@ -1,19 +1,15 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, Button, ImageBackground, Image,  Pressable,ScrollView, Switch, ActivityIndicator} from "react-native";
+import { View, Text, Image,  Pressable,ScrollView, ActivityIndicator} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import Modal from 'react-native-modal'
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
-import { File } from 'expo-file-system/next';
-import { decode } from 'base64-arraybuffer';
 import { ai } from '../config/initGemini.js'
 import { isNotLoggedIn, roundUpToDecimal } from '../util/common.js';
 import useDictionary from '../hook/useDictionary.js';
 import {supabase} from '../config/initSupabase.js';
 import Header from '../components/Header.js';
-import Navigation from '../components/Nav.js';
 import styles from '../assets/style.js';
-import { copyAsync } from 'expo-file-system/legacy';
 import { Alert } from 'react-native';
 
 export default function Subject ({navigation, route}){
@@ -191,7 +187,9 @@ export default function Subject ({navigation, route}){
         response.text ||
         response.candidates?.[0]?.content?.parts?.[0]?.text;
 
-
+        if(!notes){
+            throw new Error("No notes generated");
+        }
 
       const { error: dbError } = await supabase.from("notes")
       .insert({
@@ -229,20 +227,6 @@ export default function Subject ({navigation, route}){
 
             setFiles(data);
     }
-
-  async function testGemini() {
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
-      contents: 'Say hello in one sentence.',
-    });
-
-
-
-  } catch (error) {
-    return;
-  }
-}
 
 
     if(loading){
