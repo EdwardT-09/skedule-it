@@ -100,7 +100,7 @@ export default function Subject ({navigation, route}){
         const file = result.assets[0];
 
         if (file.mimeType !== "application/pdf") {
-            Alert.alert("Invalid File", "Please select a PDF document.");
+            Alert.alert(dictionary.invalid_file, dictionary.format_prompt);
             return;
         }
 
@@ -112,14 +112,14 @@ export default function Subject ({navigation, route}){
         }
         await getFiles();
         Alert.alert(
-            "Success",
-            "Your notes have been generated successfully."
+            dictionary.success,
+            dictionary.success_desc_subj
         );
     } catch(err){
         console.log(err.message);
          Alert.alert(
-            "Generation Failed",
-            "We couldn't generate notes from this document. Please try again."
+            dictionary.generation_failed,
+            dictionary.generation_failed_desc
         );
     }
     finally{

@@ -93,20 +93,6 @@ export default function Schedule({navigation}){
         setMondayAnchor(prevMonday);
    };
 
-    const uploadDocument = async() =>{
-        //allows users to slect the files to upload (open file selection window)
-        const result = await DocumentPicker.getDocumentAsync({
-            copyToCacheDirectory: true,
-        })
-
-        //if user did not pick any file (press cancel), return
-        if (result.canceled) return;
-
-        for (const file of result.assets){
-            await uploadToDatabase(file);
-        }
-        
-    }
 
 
     const exportToICS = async(events) =>{

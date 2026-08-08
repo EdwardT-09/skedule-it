@@ -36,10 +36,10 @@ export function toICSDate(date, time) {
 
 export function generateICS(events) {
   const header =
-`BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-PRODID:-//SkeduleIt//Schedule Export//EN`;
+      `BEGIN:VCALENDAR
+      VERSION:2.0
+      CALSCALE:GREGORIAN
+      PRODID:-//SkeduleIt//Schedule Export//EN`;
 
   const footer = "END:VCALENDAR";
 
@@ -52,11 +52,11 @@ PRODID:-//SkeduleIt//Schedule Export//EN`;
     const rrule = buildRRule(event.recurring, event.end_date);
 
     return `BEGIN:VEVENT
-SUMMARY:${(event.title || "No Title").replace(/\n/g, " ")}
-DTSTART:${start}
-DTEND:${end}
-${rrule}
-END:VEVENT`;
+      SUMMARY:${(event.title || "No Title").replace(/\n/g, " ")}
+      DTSTART:${start}
+      DTEND:${end}
+      ${rrule}
+      END:VEVENT`;
   }).filter(Boolean).join("\n");
 
   return `${header}\n${body}\n${footer}`;

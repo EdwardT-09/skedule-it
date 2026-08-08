@@ -9,11 +9,9 @@ import {SpaceGrotesk_400Regular,SpaceGrotesk_700Bold,} from '@expo-google-fonts/
 import { Sintony_400Regular, Sintony_700Bold } from '@expo-google-fonts/sintony';
 import { Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import styles from './assets/style.js';
-import useDictionary from './hook/useDictionary.js'
 import {supabase} from './config/initSupabase.js';
 import { getStateFromPath } from '@react-navigation/native';
 
-import * as Linking from "expo-linking";
 import Landing from './screens/Landing.js';
 import SignIn from './screens/SignIn.js';
 import Register from './screens/Register.js';
@@ -41,7 +39,6 @@ const Stack = createNativeStackNavigator();
 
 export default function App(){
   const [isConnected, setIsConnected] = useState(true);
-  const {dictionary, loading} = useDictionary();
 
   useEffect(()=>{
     const unsubscribe = NetInfo.addEventListener(state=>{
@@ -51,19 +48,6 @@ export default function App(){
     return ()=> unsubscribe
   }, [])
 
-
-
-useEffect(() => {
-  Linking.getInitialURL().then((url) => {
-    console.log("INITIAL URL:", url);
-  });
-
-  const sub = Linking.addEventListener("url", ({ url }) => {
-    console.log("URL EVENT:", url);
-  });
-
-  return () => sub.remove();
-}, []);
 
 
 const linking = {

@@ -187,7 +187,7 @@ export default function AddSchedule ({navigation, route}){
 
             Generate complete event rows for this timeline window. Return ONLY a valid JSON array of objects. Each object maps perfectly to the database model schema details below:
             - user_id (string): Use exactly "${user.id}"
-            - title (string): High contrast title descriptive of the task block
+            - title (string): High contrast title descriptive of the task block. MUST be exactly one of the provided subject names from the Performance statistics. Do not modify, shorten, expand, rephrase, or add any words to the subject name. Do not include topics, activities, chapters, assignments, lab names, or descriptions in the title.
             - color (string): Provide a vibrant hex aesthetic palette choice matching your design language. Use only these values: '#FFA94D', '#FEE172', '#FFB6C1', or '#cdf5e9'
             - start_date (string): String date block formatted as YYYY-MM-DD
             - end_date (string): String terminal boundary limit sequence formatted as YYYY-MM-DD (set this to ${formattedEndDate} for recurring elements)

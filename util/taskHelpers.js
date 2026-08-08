@@ -58,10 +58,7 @@
         const currentDateStr = getCurrentDateStr();
         const todayName = getTodayName();
 
-        if(
-            task.has_deadline && task.end_date && task.end_date < currentDateStr
-
-        ){
+        if(task.has_deadline && task.end_date && task.end_date < currentDateStr){
             return false;
         }
         const oneTimeTask = task.start_date === currentDateStr;

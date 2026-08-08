@@ -11,7 +11,6 @@ export default function useTask(){
         const user = (await supabase.auth.getUser()).data.user;
 
         if(!user) return;
-        console.log("1");
         //get data for today
         const {data, error} = await supabase
             .from('tasks')
@@ -23,43 +22,17 @@ export default function useTask(){
         if(data){
             const todayFiltered = data.filter(isTodayTask);
             const withParents = includeParents(todayFiltered)
-            todayFiltered.sort(
-                (a,b) =>
-                    //when it is negative, a will come first
-                    //when it is positive, b will come first
-                    //if its equal, it will keep the same order
-                    priorities.indexOf(a.priority) - priorities.indexOf(b.priority)
-            )
-            setTodayTasks(organizeTasks(todayFiltered));
+            setTodayTasks(organizeTasks(withParents));
         }
 
    
         if(error){
             console.log(error);
         }
-
-        //get data for the month
-        const {data : upcomingData, error: upcomingError} = await supabase
-            .from('tasks')
-            .select('id, title, start_date, end_date, has_deadline, recurring, priority, parent_key, level, completed_on')
-            .eq('user_id', user.id)
-            .gt('start_date', getCurrentDateStr() )
-
-        if(upcomingError){
-            console.log(upcomingError)
-        }
             
-        if(upcomingData){
-            upcomingData.sort(
-                (a,b) =>
-                    //when it is negative, a will come first
-                    //when it is positive, b will come first
-                    //if its equal, it will keep the same order
-                    // new Date(a.date) - new Date (b.date),
-                    priorities.indexOf(a.priority) - priorities.indexOf(b.priority)
-            )
+            const upcomingData = data.filter(task => task.start_date > getCurrentDateStr());
             setUpcomingTasks(organizeTasks(upcomingData));
-        }
+        
 
 
 

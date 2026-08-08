@@ -14,8 +14,7 @@ import Checkbox from 'expo-checkbox';
 
 export default function Tasks ({navigation}){
     const [selectedTask, setSelectedTask] = useState();
-console.log("Today Tasks:", todayTasks);
-console.log("Upcoming Tasks:", upcomingTasks);
+
     const {
         todayTasks,
         upcomingTasks,

@@ -339,7 +339,7 @@ export default function Home({navigation}){
                 <Modal style={{justifyContent: 'flex-end', margin:0,}} transparent={true} isVisible={deadlineModalVisible} swipeDirection="down" onSwipeComplete={()=> setDeadlineModalVisible(false)} onBackdropPress={()=> setDeadlineModalVisible(false)} propagateSwipe={true}>
                     <View style={[styles.modalMenuContainer, {padding:25}]}>
                         <View style={{flex:0, flexDirection:'row', justifyContent:'space-between'}}>
-                            <Text style={styles.dueTodayText}>Due Today</Text>
+                            <Text style={styles.dueTodayText}>{dictionary.due_today}</Text>
                             <Pressable onPress={()=> setDeadlineModalVisible(false)}>
                                 <Image source={require('../assets/close.png')}/>
                             </Pressable>

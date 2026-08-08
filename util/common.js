@@ -21,8 +21,6 @@ export const isLoggedIn = async(navigation) => {
 export const isNotLoggedIn = async(navigation) => {
     const user = (await supabase.auth.getUser()).data.user;
 
-
-
     if(!user){
         navigation.navigate('Landing');
     }

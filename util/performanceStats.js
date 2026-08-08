@@ -23,23 +23,23 @@ export const getDurationBySubject = (subjects, logs) =>{
 
 
 export const getSessionCountBySubject = (subjects, logs) => {
-    const result = {};
+        const result = {};
 
-    subjects.forEach((subject) => {
-    result[subject.id] = {
-        subject_code: subject.subject_code,
-        sessions: 0,
-    }
-})
-
-    logs.forEach((item) => {
-        if(result[item.subject]){
-            result[item.subject].sessions += 1;
+        subjects.forEach((subject) => {
+        result[subject.id] = {
+            subject_code: subject.subject_code,
+            sessions: 0,
         }
     })
 
-    return result;
-}
+        logs.forEach((item) => {
+            if(result[item.subject]){
+                result[item.subject].sessions += 1;
+            }
+        })
+
+        return result;
+    }
 
 export const getAvgConfidenceBySubject = (subjects, logs) => {
     const totals = {};

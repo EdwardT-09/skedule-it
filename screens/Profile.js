@@ -13,6 +13,11 @@ export default function Profile({navigation}){
     const [isEnabled, setIsEnabled] = useState(false);
     const [username, setUsername] = useState('');
     const [gender, setGender] = useState('');
+    const {dictionary, loading} = useDictionary();
+    const genderLabels = {
+        Male:dictionary.male,
+        Female:dictionary.female
+    }
     const genderImage = {
         Male : require('../assets/Male.png'),
         Female : require('../assets/Female.png'),
@@ -23,7 +28,8 @@ export default function Profile({navigation}){
             isNotLoggedIn(navigation);
     },[])
 
-    const {dictionary, loading} = useDictionary();
+
+
 
     const saveNotification = async() => {
         const toggle = !isEnabled;
@@ -105,7 +111,7 @@ export default function Profile({navigation}){
                             <Image source={genderImage[gender]} style={{width:200, height:200, resizeMode:'contain', marginTop:'5%',}}></Image>
                             <Text style={styles.profileName}>{username}</Text>
                         </View>
-                        <Text style={styles.profileGender}>{gender}</Text>
+                        <Text style={styles.profileGender}>{genderLabels[gender]}</Text>
                         <View style={[styles.container, {marginTop:'10%'}]}>
                             <View style={[styles.titleContainer]}>
                                 <View style={{paddingLeft: '5%'}}>

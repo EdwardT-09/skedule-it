@@ -6,7 +6,6 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Header from '../components/Header.js';
 import styles from '../assets/style.js';
-import * as Linking from "expo-linking";
 import { validateEmail } from "../util/validation.js";
 
 export default function ForgotPassword({navigation}){
