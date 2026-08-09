@@ -304,7 +304,7 @@ export default function AddSchedule ({navigation, route}){
             if(!error){
                 navigation.navigate('Schedule');
             }
-    }}
+            }}
         //retrieve all users' subjects 
         const fetchSubjects = async() =>{
             const user = (await supabase.auth.getUser()).data.user;
@@ -330,14 +330,15 @@ export default function AddSchedule ({navigation, route}){
     
             if(!user) return;
     
+            const twoMonthsAgo = new Date();
+            twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2)
 
     
             const {data, error} = await supabase
             .from('study_logs')
             .select('id, subject, duration, confidence')
             .eq('user_id', user?.id)
-            .gte("created_at", startDate.toISOString())
-            .lte("created_at", endDate.toISOString());
+            .gte("created_at", twoMonthsAgo.toISOString());
     
             if(error){
                 return [];
@@ -389,7 +390,8 @@ export default function AddSchedule ({navigation, route}){
                                             <TextInput style={styles.input} placeholder={dictionary.subject_placeholder} value={subject} onChangeText={setSubject} placeholderTextColor='#555555'></TextInput>
                                             {subjectError ? (<Text style={styles.errorText}>{subjectError}</Text>) : null}
                                         </View>):null}
-                                <View style={styles.fields}>
+                                        {isAiMode? (<Text>{dictionary.generation_explanation}</Text>):null}
+                                        <View style={styles.fields}>
                                         <Text style={styles.fieldLabels}>{dictionary.start_date}:</Text>
                                         <Pressable style={{backgroundColor:'transparent'}} onPress={()=> setShowStartDate(true)} ><View style={[styles.input, {flex:0, justifyContent:'center', paddingHorizontal:'3%'}]}>
                                             <Text>{startDate.getDate()}/{startDate.getMonth()+1}/{startDate.getFullYear()}</Text></View></Pressable>
