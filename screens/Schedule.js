@@ -189,16 +189,9 @@ export default function Schedule({navigation}){
     })
 
 
+
     
-    if(loading){
-        return(
 
-            <View style={{flex: 1, justifyContent:"center", alignItems:"center"}}>
-                <ActivityIndicator size="large" color="black"></ActivityIndicator>
-            </View>
-
-        )
-    }
 
     return (
         <View>
@@ -222,7 +215,39 @@ export default function Schedule({navigation}){
     )
    }
 
-   
+    const deleteEvent = async(selectedEvent) =>{
+            const user = (await supabase.auth.getUser()).data.user;
+
+            if(!user) return;
+
+            const {error} = await supabase
+            .from('schedule_events')
+            .delete()
+            .eq('id', selectedEvent)
+
+            if(error){
+                console.log(error);
+            } else{ 
+                setEventMenuVisible(false);
+                navigation.navigate('Schedule')
+            }
+    }
+
+
+    if(loading){
+        return(
+
+            <View style={{flex:1}}>
+                <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
+                    <Header></Header>
+                    <View style={{flex: 1, justifyContent:"center", alignItems:"center"}}>
+                        <ActivityIndicator size="large" color="black"></ActivityIndicator>
+                    </View>
+                </LinearGradient>
+            </View>
+
+        )
+    }
 
     return(
     <View style={{flex:1}}>
@@ -290,7 +315,7 @@ export default function Schedule({navigation}){
                                     <Image source={require('../assets/Edit.png')} style={styles.modalMenuImage}></Image>
                                     <Text style={styles.taskMenuLabels}>{dictionary.edit}</Text>
                                 </Pressable>
-                                <Pressable onPress= {()=> {deleteTask(selectedEvent);setEventMenuVisible(false)}} style={({pressed})=> ([styles.modalMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
+                                <Pressable onPress= {()=> {deleteEvent(selectedEvent);setEventMenuVisible(false)}} style={({pressed})=> ([styles.modalMenuItem,{ backgroundColor: pressed ? 'rgb(235, 235, 235)': null}])}>
                                     <Image source={require('../assets/Trash.png')} style={styles.modalMenuImage}></Image>
                                     <Text style={[styles.taskMenuLabels, {color:'#c14343'}]}>{dictionary.delete}</Text>
                                 </Pressable>

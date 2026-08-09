@@ -249,9 +249,9 @@ export default function AddTask ({navigation, route}){
             <View style={{flex:1}}>
             <LinearGradient colors={['#F9FAF4', '#F9FAF4', '#cdf5e9', '#FEE172']} style={{flex:1}}>
                 <Header></Header>
-            <View style={{flex: 1, justifyContent:"center", alignItems:"center"}}>
-                <ActivityIndicator size="large" color="black"></ActivityIndicator>
-            </View>
+                <View style={{flex: 1, justifyContent:"center", alignItems:"center"}}>
+                    <ActivityIndicator size="large" color="black"></ActivityIndicator>
+                </View>
             </LinearGradient>
             </View>
         )
