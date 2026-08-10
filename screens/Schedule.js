@@ -189,10 +189,6 @@ export default function Schedule({navigation}){
     })
 
 
-
-    
-
-
     return (
         <View>
             {cellEvent && (
